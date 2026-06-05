@@ -1,5 +1,6 @@
 from zxcvbn import zxcvbn
 from app.services.rule_checker import RuleChecker
+from app.services.hibp_checker import HibpChecker
 
 # Kamus Terjemahan Zxcvbn (Inggris -> Indonesia)
 TRANSLATIONS = {
@@ -58,6 +59,9 @@ class PasswordAnalyzer:
         variation = RuleChecker.check_character_variation(password)
         has_repetition = RuleChecker.check_repetition(password)
         has_sequence = RuleChecker.check_sequence(password)
+        
+        # 3. Cek Kebocoran (HIBP)
+        is_breached, breach_count = HibpChecker.check_breached_password(password)
 
         length_score = min((length / 12) * 20, 20) if length > 0 else 0
         var_count = sum(variation.values())
@@ -67,11 +71,16 @@ class PasswordAnalyzer:
         if has_repetition or has_sequence:
             pattern_score = 0
 
-        # 3. Hitung Skor Akhir
+        # 4. Hitung Skor Akhir
         final_score = int(base_score + length_score + var_score + pattern_score)
-        final_score = min(final_score, 100)
+        
+        # PENALTI KEBOCORAN
+        if is_breached:
+            final_score = min(final_score, 20)
+        else:
+            final_score = min(final_score, 100)
 
-        # 4. Kategori
+        # 5. Kategori
         if final_score <= 20:
             category = "Sangat Lemah"
         elif final_score <= 40:
@@ -83,22 +92,26 @@ class PasswordAnalyzer:
         else:
             category = "Sangat Kuat"
 
-        # 5. Peringatan dan Saran
+        # 6. Translasi Peringatan dan Saran
         raw_warning = zxcvbn_result['feedback']['warning']
         raw_suggestions = zxcvbn_result['feedback']['suggestions']
 
         warning = PasswordAnalyzer.translate(raw_warning, "warnings") if raw_warning else "Tidak ditemukan pola lemah yang dominan."
-        
+        if is_breached:
+             warning = f"BAHAYA: Kata sandi ini telah ditemukan dalam kebocoran data sebanyak {breach_count} kali!"
+
         suggestions = [PasswordAnalyzer.translate(sug, "suggestions") for sug in raw_suggestions]
-        if not suggestions:
+        if not suggestions and not is_breached:
             suggestions = ["Gunakan kombinasi yang lebih panjang dan unik."]
+        elif is_breached:
+            suggestions.insert(0, "Segera ganti kata sandi ini karena sudah tidak aman untuk digunakan.")
 
         return {
             "score": final_score,
             "category": category,
             "password_length": length,
-            "is_breached": False,
-            "breach_count": 0,
+            "is_breached": is_breached,
+            "breach_count": breach_count,
             "detected_patterns": [warning],
             "recommendations": suggestions
         }

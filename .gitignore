@@ -1,0 +1,13 @@
+# Environments
+venv/
+env/
+.env
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Node.js (untuk Frontend nanti)
+node_modules/

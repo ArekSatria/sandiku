@@ -1,5 +1,9 @@
 from fastapi import FastAPI
-from app.routers import analyzer_router  # Import router yang baru dibuat
+from app.routers import analyzer_router
+from app.database import engine, Base
+
+# otomatis membuat tabel users dan analysis_logs jika belum ada
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="SANDIKU API",
@@ -7,7 +11,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Daftarkan router ke dalam aplikasi utama
+# Daftarkan router
 app.include_router(analyzer_router.router)
 
 @app.get("/")

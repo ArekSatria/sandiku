@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import analyzer_router
+from app.routers import analyzer_router, auth_router
 from app.database import engine, Base
 
 # otomatis membuat tabel users dan analysis_logs jika belum ada
@@ -13,6 +13,7 @@ app = FastAPI(
 
 # Daftarkan router
 app.include_router(analyzer_router.router)
+app.include_router(auth_router.router)
 
 @app.get("/")
 def read_root():

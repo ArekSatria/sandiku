@@ -10,10 +10,10 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav className="navbar navbar-expand-lg navbar-dark glass-navbar sticky-top shadow-sm py-3">
       <div className="container">
-        <Link className="navbar-brand fw-bold" to="/">
-          SANDIKU
+        <Link className="navbar-brand fw-bold fs-4 tracking-tight" to="/">
+          <i className="bi bi-shield-lock-fill text-primary me-2"></i>SANDIKU
         </Link>
         <button
           className="navbar-toggler"

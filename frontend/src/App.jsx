@@ -1,28 +1,20 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Analyzer from "./pages/Analyzer";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
 
-// Placeholder halaman sementara (Nanti akan kita buat file aslinya di folder pages)
-const Home = () => (
-  <div className="container mt-5">
-    <h1>Halaman Beranda</h1>
-    <p>Selamat datang di SANDIKU.</p>
-  </div>
-);
-const Analyzer = () => (
-  <div className="container mt-5">
-    <h1>Halaman Analisis Kata Sandi</h1>
-  </div>
-);
-const Login = () => (
-  <div className="container mt-5">
-    <h1>Halaman Login Admin</h1>
-  </div>
-);
-const Dashboard = () => (
-  <div className="container mt-5">
-    <h1>Dashboard Statistik Admin</h1>
-  </div>
-);
+// Fungsi pelindung rute agar Dashboard tidak bisa ditembus sembarang orang tanpa token
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+  return token ? children : <Navigate to="/login" replace />;
+};
 
 function App() {
   return (
@@ -32,7 +24,19 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/analyzer" element={<Analyzer />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+
+        {/* Melindungi halaman Dashboard menggunakan elemen rute terproteksi */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Fallback ke beranda jika mengetik url ngawur */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

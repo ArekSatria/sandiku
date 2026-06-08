@@ -182,3 +182,21 @@
     border-right-color: var(--border);
   }
 }
+
+.input-group.seamless-input {
+  border: 1px solid rgba(226, 232, 240, 1);
+  transition: all 0.3s ease;
+}
+
+.input-group.seamless-input:focus-within {
+  box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.15) !important;
+  border-color: #3b82f6;
+}
+
+/* Kustomisasi List Hasil Analisis */
+.cyber-list .list-group-item {
+  transition: background-color 0.2s ease;
+}
+.cyber-list .list-group-item:hover {
+  background-color: #f8fafc !important;
+}

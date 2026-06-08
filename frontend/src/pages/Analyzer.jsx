@@ -1,166 +1,215 @@
 import { useState } from "react";
 import api from "../services/api";
-import StrengthMeter from "../components/StrengthMeter";
 
 const Analyzer = () => {
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleAnalyze = async (e) => {
     e.preventDefault();
-    if (!password) {
-      setError("Kata sandi tidak boleh kosong!");
-      return;
-    }
-
+    if (!password) return;
     setLoading(true);
-    setError("");
-
     try {
-      const response = await api.post("/api/analyze", { password });
-      setResult(response.data);
-    } catch (err) {
-      setError(
-        "Terjadi kesalahan saat menghubungi server. Pastikan backend menyala.",
-      );
+      const res = await api.post("/api/analyze", { password });
+      setResult(res.data);
+    } catch (error) {
+      console.error("Gagal terhubung ke server:", error);
     } finally {
       setLoading(false);
     }
   };
 
- return (
-   <div className="container mt-5 animate-fade-in">
-     <div className="row justify-content-center">
-       <div className="col-md-8">
-         <div className="card-premium p-1">
-           {" "}
-           {/* <-- Menggunakan card-premium */}
-           <div className="card-body p-5">
-             <h3 className="fw-bold text-center mb-4 text-dark">
-               Analisis Kekuatan Kata Sandi
-             </h3>
+  const getColorTheme = (score) => {
+    if (score <= 25) return { hex: "#ef4444", name: "danger" };
+    if (score <= 50) return { hex: "#f59e0b", name: "warning" };
+    if (score <= 75) return { hex: "#3b82f6", name: "primary" };
+    return { hex: "#10b981", name: "success" };
+  };
 
-             <form onSubmit={handleAnalyze}>
-               <div className="mb-4">
-                 <input
-                   type="text"
-                   className="form-control form-control-lg bg-light border-0"
-                   placeholder="Ketik kata sandi Anda di sini..."
-                   value={password}
-                   onChange={(e) => setPassword(e.target.value)}
-                   style={{ padding: "15px 20px", borderRadius: "10px" }}
-                 />
-               </div>
-               <button
-                 type="submit"
-                 className="btn btn-cyber w-100 btn-lg fw-bold rounded-3" /* <-- Menggunakan btn-cyber */
-                 disabled={loading}
-               >
-                 {loading ? "Memproses Analisis..." : "Analisis Sekarang"}
-               </button>
-             </form>
+  return (
+    <div className="container mt-5 fade-in-up">
+      <div className="row justify-content-center">
+        <div className="col-md-7">
+          <div className="text-center mb-5">
+            <h2 className="fw-bold text-dark mb-2">Audit Kredensial</h2>
+            <p className="text-muted">
+              Masukkan kata sandi untuk menganalisis kerentanan secara instan.
+            </p>
+          </div>
 
-             {error && <div className="alert alert-danger mt-3">{error}</div>}
+          <form onSubmit={handleAnalyze} className="mb-5">
+            <div className="input-group seamless-input mb-3 p-1">
+              <span className="input-group-text border-0 px-3">
+                <i className="bi bi-lock text-muted"></i>
+              </span>
+              <input
+                type={showPassword ? "text" : "password"}
+                className="form-control form-control-lg border-0 shadow-none fs-6"
+                placeholder="Ketik kata sandi di sini..."
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="input-group-text border-0 px-3"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <i
+                  className={
+                    showPassword
+                      ? "bi bi-eye-slash text-muted"
+                      : "bi bi-eye text-muted"
+                  }
+                ></i>
+              </button>
+            </div>
+            <button
+              type="submit"
+              className="btn btn-ultra w-100 py-3"
+              disabled={loading || !password}
+            >
+              {loading ? "Menjalankan Audit..." : "Proses Analisis"}
+            </button>
+          </form>
 
-             {/* Menampilkan Hasil Analisis */}
-             {result && (
-               <div className="mt-5 animate__animated animate__fadeIn">
-                 <h4 className="fw-bold border-bottom pb-2">Hasil Analisis</h4>
+          {result &&
+            (() => {
+              const theme = getColorTheme(result.score);
+              return (
+                <div className="ultra-card p-5 mb-5 fade-in-up">
+                  {/* Header Hasil */}
+                  <div className="d-flex justify-content-between align-items-center mb-4 pb-4 border-bottom">
+                    <div>
+                      <h5 className="fw-bold mb-1 text-dark">
+                        Ringkasan Analisis
+                      </h5>
+                      <span
+                        className={`ultra-badge bg-${theme.name} bg-opacity-10 text-${theme.name}`}
+                      >
+                        {result.category}
+                      </span>
+                    </div>
+                    <div className="text-end">
+                      <h1
+                        className="fw-bolder mb-0"
+                        style={{
+                          color: theme.hex,
+                          fontSize: "3rem",
+                          letterSpacing: "-2px",
+                        }}
+                      >
+                        {result.score}
+                        <span className="fs-5 text-muted fw-normal">/100</span>
+                      </h1>
+                    </div>
+                  </div>
 
-                 <StrengthMeter score={result.score} />
+                  {/* Indikator Bar Clean */}
+                  <div className="mb-5">
+                    <div
+                      className="progress bg-light"
+                      style={{ height: "8px", overflow: "visible" }}
+                    >
+                      <div
+                        className="progress-bar"
+                        role="progressbar"
+                        style={{
+                          width: `${result.score}%`,
+                          backgroundColor: theme.hex,
+                          borderRadius: "8px",
+                          transition: "width 1s cubic-bezier(0.4, 0, 0.2, 1)",
+                        }}
+                      ></div>
+                    </div>
+                    <div
+                      className="d-flex justify-content-between mt-2 text-muted"
+                      style={{ fontSize: "0.8rem" }}
+                    >
+                      <span>Panjang: {result.password_length} Karakter</span>
+                      <span>Tingkat Ketertebakan</span>
+                    </div>
+                  </div>
 
-                 <div className="row mt-4">
-                   <div className="col-md-6 mb-3">
-                     <div className="p-3 bg-light rounded text-center">
-                       <span className="d-block text-muted small">
-                         Kategori
-                       </span>
-                       <h4
-                         className={`fw-bold mb-0 ${result.score > 60 ? "text-success" : "text-danger"}`}
-                       >
-                         {result.category}
-                       </h4>
-                     </div>
-                   </div>
-                   <div className="col-md-6 mb-3">
-                     <div className="p-3 bg-light rounded text-center">
-                       <span className="d-block text-muted small">
-                         Panjang Karakter
-                       </span>
-                       <h4 className="fw-bold mb-0 text-dark">
-                         {result.password_length}
-                       </h4>
-                     </div>
-                   </div>
-                 </div>
+                  {/* Peringatan Kebocoran Minimalis */}
+                  {result.is_breached && (
+                    <div
+                      className="p-4 mb-4 rounded-4"
+                      style={{
+                        backgroundColor: "#fef2f2",
+                        border: "1px solid #fecaca",
+                      }}
+                    >
+                      <div className="d-flex">
+                        <i className="bi bi-shield-x text-danger fs-4 me-3"></i>
+                        <div>
+                          <h6 className="fw-bold text-danger mb-1">
+                            Kredensial Terkompromi
+                          </h6>
+                          <p className="mb-0 text-danger opacity-75 small">
+                            Ditemukan dalam basis data kebocoran publik sebanyak{" "}
+                            <strong>
+                              {result.breach_count.toLocaleString("id-ID")}
+                            </strong>{" "}
+                            kali.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
-                 {result.is_breached && (
-                   <div className="alert alert-danger fw-bold shadow-sm border-danger border-2 mt-2">
-                     ⚠️ PERINGATAN! Kata sandi ini telah ditemukan dalam data
-                     kebocoran internet sebanyak{" "}
-                     {result.breach_count.toLocaleString("id-ID")} kali. JANGAN
-                     DIGUNAKAN!
-                   </div>
-                 )}
+                  {/* Detail Kelemahan & Rekomendasi (Clean Text Only) */}
+                  <div className="row mt-4">
+                    <div className="col-12 mb-4">
+                      <h6 className="fw-bold text-dark fs-6 mb-3">
+                        Identifikasi Kerentanan
+                      </h6>
+                      {result.detected_patterns &&
+                      result.detected_patterns.length > 0 ? (
+                        <ul className="list-unstyled mb-0">
+                          {result.detected_patterns.map((pattern, index) => (
+                            <li
+                              key={index}
+                              className="mb-2 text-secondary small d-flex align-items-start"
+                            >
+                              <i className="bi bi-dash text-danger me-2"></i>{" "}
+                              {pattern}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <span className="text-success small d-flex align-items-center">
+                          <i className="bi bi-check2 me-2"></i>Tidak ada
+                          kerentanan struktural dominan.
+                        </span>
+                      )}
+                    </div>
 
-                 <div className="mt-4">
-                   <h6 className="fw-bold text-muted">
-                     Kelemahan yang Ditemukan:
-                   </h6>
-                   <ul className="list-group list-group-flush mb-3">
-                     {result.detected_patterns &&
-                     result.detected_patterns.length > 0 ? (
-                       result.detected_patterns.map((pattern, index) => (
-                         <li
-                           key={index}
-                           className="list-group-item bg-transparent px-0 text-danger"
-                         >
-                           ⚠️ {pattern}
-                         </li>
-                       ))
-                     ) : (
-                       <li className="list-group-item bg-transparent px-0 text-success">
-                         ✔ Tidak ada pola lemah yang dominan.
-                       </li>
-                     )}
-                   </ul>
-
-                   <h6 className="fw-bold text-muted">
-                     Rekomendasi Perbaikan:
-                   </h6>
-                   <ul className="list-group list-group-flush">
-                     {result.recommendations &&
-                     result.recommendations.length > 0 ? (
-                       result.recommendations.map((rec, index) => (
-                         <li
-                           key={index}
-                           className="list-group-item bg-transparent px-0 text-success"
-                         >
-                           💡 {rec}
-                         </li>
-                       ))
-                     ) : (
-                       <li className="list-group-item bg-transparent px-0 text-success">
-                         ✔ Kata sandi sudah memenuhi kriteria standar.
-                       </li>
-                     )}
-                   </ul>
-                 </div>
-
-                 <p className="text-center text-muted small mt-5 mb-0">
-                   *Kata sandi Anda diproses secara anonim dan tidak disimpan
-                   dalam database.
-                 </p>
-               </div>
-             )}
-           </div>
-         </div>
-       </div>
-     </div>
-   </div>
- );
+                    <div className="col-12">
+                      <h6 className="fw-bold text-dark fs-6 mb-3">
+                        Saran Mitigasi
+                      </h6>
+                      <ul className="list-unstyled mb-0">
+                        {result.recommendations.map((rec, index) => (
+                          <li
+                            key={index}
+                            className="mb-2 text-secondary small d-flex align-items-start"
+                          >
+                            <i className="bi bi-arrow-return-right text-primary me-2 mt-1"></i>{" "}
+                            {rec}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Analyzer;

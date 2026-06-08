@@ -1,68 +1,114 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #f8fafc; /* Warna latar abu-abu kebiruan sangat terang */
+  background-color: #fcfdfd; /* Putih sangat terang dengan sentuhan biru-abu */
+  color: #1e293b; /* Abu-abu gelap elegan, bukan hitam pekat */
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Efek Glow Latar Belakang (Aesthetic Mesh) */
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 500px;
+  background: radial-gradient(circle at 50% -20%, rgba(226, 232, 240, 0.8) 0%, rgba(252, 253, 253, 0) 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Navbar Kaca Super Bersih */
+.glass-navbar {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+}
+
+/* Kartu Minimalis Aesthetic */
+.ultra-card {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid rgba(241, 245, 249, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 24px 38px 3px rgba(0, 0, 0, 0.02);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+}
+
+.ultra-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 34px 45px 5px rgba(0, 0, 0, 0.03);
+}
+
+/* Tombol Minimalis Modern */
+.btn-ultra {
+  background-color: #0f172a; /* Navy sangat gelap */
+  color: #ffffff;
+  border-radius: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-ultra:hover {
+  background-color: #1e293b;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.15);
+}
+
+.btn-outline-ultra {
+  background-color: transparent;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-ultra:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
   color: #0f172a;
 }
 
-/* Efek Kaca untuk Navbar */
-.glass-navbar {
-  background: rgba(15, 23, 42, 0.95) !important;
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+/* Input Super Bersih */
+.seamless-input {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  transition: all 0.2s ease;
 }
-
-/* Kartu Premium dengan Bayangan Halus */
-.card-premium {
+.seamless-input:focus-within {
   background: #ffffff;
-  border-radius: 1rem;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 4px rgba(241, 245, 249, 1) !important;
+}
+.seamless-input input, .seamless-input button, .seamless-input span {
+  background: transparent !important;
 }
 
-.card-premium:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+/* Pill Badges Modern */
+.ultra-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
-/* Tombol Ala Siber */
-.btn-cyber {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  border: none;
-  color: white;
-  transition: all 0.3s ease;
+/* Animasi */
+.fade-in-up {
+  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(15px);
 }
 
-.btn-cyber:hover {
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-  box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39);
-  transform: translateY(-1px);
-}
-
-/* Teks Gradien untuk Judul */
-.text-gradient {
-  background: linear-gradient(to right, #1e40af, #3b82f6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Animasi Masuk Halus */
-.animate-fade-in {
-  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.animate-slide-up {
-  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
+@keyframes fadeInUp {
   to { opacity: 1; transform: translateY(0); }
 }

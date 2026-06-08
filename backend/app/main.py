@@ -1,17 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Import semua model agar SQLAlchemy mengenali struktur tabel.
-from app.models.user import User
-from app.models.analysis_log import AnalysisLog
-
-# Import router aplikasi.
-from app.routers import analyzer_router, auth_router, dashboard_router
-from app.database import Base, engine
 from app.core.config import CORS_ORIGINS
+from app.core.db_init import init_database
+from app.routers import analyzer_router, auth_router, dashboard_router
 
-# Membuat tabel database otomatis jika belum terbentuk.
-Base.metadata.create_all(bind=engine)
+init_database()
 
 app = FastAPI(
     title="SANDIKU API",
@@ -19,7 +13,6 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Konfigurasi CORS diambil dari environment variable CORS_ORIGINS.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
@@ -28,7 +21,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mendaftarkan seluruh router ke aplikasi utama.
 app.include_router(analyzer_router.router)
 app.include_router(auth_router.router)
 app.include_router(dashboard_router.router)

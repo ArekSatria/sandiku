@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import List, Literal
 
 from pydantic import BaseModel, Field
@@ -23,4 +22,6 @@ class PasswordResponse(BaseModel):
     hibp_status: Literal["checked", "failed"]
     detected_patterns: List[str]
     recommendations: List[str]
-    created_at: datetime
+
+    # Format kalender Indonesia, contoh: 08 Juni 2026, 13:16:13 WIB
+    created_at: str

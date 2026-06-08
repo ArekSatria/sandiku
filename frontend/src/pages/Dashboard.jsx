@@ -1,15 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import StatCard from "../components/StatCard";
+import StatusBadge from "../components/StatusBadge";
 import api from "../services/api";
 
-function StatCard({ title, value, description }) {
-  return (
-    <div className="stat-card">
-      <span>{title}</span>
-      <strong>{value}</strong>
-      {description && <p>{description}</p>}
-    </div>
-  );
+function formatNumber(value) {
+  return Number(value || 0).toLocaleString("id-ID");
+}
+
+function getCategoryClass(category) {
+  return String(category || "")
+    .toLowerCase()
+    .replace(/\s+/g, "-");
 }
 
 export default function Dashboard() {
@@ -20,6 +22,12 @@ export default function Dashboard() {
   const [analyses, setAnalyses] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const totalAnalyses = statistics?.total_analyses || 0;
+
+  const categoryDistribution = useMemo(() => {
+    return statistics?.category_distribution || [];
+  }, [statistics]);
 
   function handleLogout() {
     localStorage.removeItem("sandiku_token");
@@ -65,113 +73,148 @@ export default function Dashboard() {
     fetchDashboardData();
   }, []);
 
-  const totalAnalyses = statistics?.total_analyses || 0;
-  const averageScore = statistics?.average_score || 0;
-  const breachedCount = statistics?.breached_count || 0;
-  const hibpFailedCount = statistics?.hibp_failed_count || 0;
-  const totalBreachHits = statistics?.total_breach_hits || 0;
-
   return (
-    <main className="page">
-      <section className="dashboard-header">
+    <main className="page-shell">
+      <section className="dashboard-heading">
         <div>
-          <p className="eyebrow">Dashboard Admin</p>
+          <p className="section-kicker">Admin Dashboard</p>
           <h1>Statistik Analisis SANDIKU</h1>
-          <p className="muted">
-            Data yang ditampilkan bersifat anonim dan tidak memuat kata sandi
-            asli pengguna.
+          <p>
+            Dashboard menampilkan metadata anonim hasil analisis kata sandi
+            tanpa menyimpan kata sandi asli pengguna.
           </p>
+
           {admin && (
-            <p className="muted">
-              Login sebagai: <strong>{admin.name}</strong> ({admin.email})
-            </p>
+            <span className="admin-chip">
+              Login sebagai <strong>{admin.name}</strong> · {admin.email}
+            </span>
           )}
         </div>
 
         <div className="dashboard-actions">
-          <button className="secondary-button" onClick={fetchDashboardData}>
+          <button className="btn btn-secondary" onClick={fetchDashboardData}>
             Muat Ulang
           </button>
-          <button className="danger-button" onClick={handleLogout}>
+          <button className="btn btn-danger" onClick={handleLogout}>
             Logout
           </button>
         </div>
       </section>
 
-      {errorMessage && <div className="alert danger">{errorMessage}</div>}
+      {errorMessage && (
+        <div className="form-alert dashboard-alert">{errorMessage}</div>
+      )}
 
       {loading ? (
-        <div className="card">
+        <section className="glass-card loading-card">
+          <div className="loader" />
           <p>Memuat data dashboard...</p>
-        </div>
+        </section>
       ) : (
         <>
-          <section className="stats-grid">
+          <section className="dashboard-stats">
             <StatCard
+              icon="Σ"
               title="Total Analisis"
-              value={totalAnalyses.toLocaleString("id-ID")}
-              description="Jumlah seluruh pengujian kata sandi"
+              value={formatNumber(statistics?.total_analyses)}
+              description="Seluruh pengujian kata sandi"
             />
 
             <StatCard
+              icon="Ø"
               title="Rata-rata Skor"
-              value={Number(averageScore).toLocaleString("id-ID")}
-              description="Skor rata-rata dari seluruh analisis"
+              value={formatNumber(statistics?.average_score)}
+              description="Rata-rata skor keamanan"
             />
 
             <StatCard
+              icon="!"
               title="Password Bocor"
-              value={breachedCount.toLocaleString("id-ID")}
-              description="Jumlah kata sandi yang terindikasi bocor"
+              value={formatNumber(statistics?.breached_count)}
+              description="Terdeteksi dalam HIBP"
             />
 
             <StatCard
-              title="Total Jejak Kebocoran"
-              value={totalBreachHits.toLocaleString("id-ID")}
-              description="Akumulasi breach_count dari HIBP"
+              icon="↯"
+              title="Total Jejak Bocor"
+              value={formatNumber(statistics?.total_breach_hits)}
+              description="Akumulasi breach_count"
             />
 
             <StatCard
+              icon="?"
               title="HIBP Gagal"
-              value={hibpFailedCount.toLocaleString("id-ID")}
-              description="Jumlah pemeriksaan HIBP yang gagal"
+              value={formatNumber(statistics?.hibp_failed_count)}
+              description="Pemeriksaan eksternal gagal"
             />
           </section>
 
-          <section className="layout-two">
-            <div className="card">
-              <h3>Distribusi Kategori</h3>
-
-              {statistics?.category_distribution?.length ? (
-                <div className="category-list">
-                  {statistics.category_distribution.map((item) => (
-                    <div className="category-row" key={item.category}>
-                      <span>{item.category}</span>
-                      <strong>{item.total}</strong>
-                    </div>
-                  ))}
+          <section className="dashboard-grid">
+            <div className="glass-card">
+              <div className="card-heading">
+                <div>
+                  <p className="section-kicker">Distribusi</p>
+                  <h2>Kategori Kata Sandi</h2>
                 </div>
-              ) : (
-                <p className="muted">Belum ada data kategori.</p>
-              )}
+              </div>
+
+              <div className="distribution-list">
+                {categoryDistribution.length ? (
+                  categoryDistribution.map((item) => {
+                    const percent = totalAnalyses
+                      ? Math.round((item.total / totalAnalyses) * 100)
+                      : 0;
+
+                    return (
+                      <div className="distribution-item" key={item.category}>
+                        <div className="distribution-top">
+                          <span>{item.category}</span>
+                          <strong>
+                            {item.total} · {percent}%
+                          </strong>
+                        </div>
+                        <div className="distribution-track">
+                          <b style={{ width: `${percent}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="muted-text">Belum ada data kategori.</p>
+                )}
+              </div>
             </div>
 
-            <div className="card">
-              <h3>Catatan Privasi</h3>
-              <p>
-                Dashboard hanya menampilkan metadata anonim, seperti panjang
-                kata sandi, skor, kategori, status kebocoran, dan waktu
-                analisis. Sistem tidak menyimpan kata sandi asli maupun hash
-                kata sandi publik.
-              </p>
+            <div className="glass-card">
+              <div className="card-heading">
+                <div>
+                  <p className="section-kicker">Privasi</p>
+                  <h2>Data yang Disimpan</h2>
+                </div>
+              </div>
+
+              <div className="privacy-checks">
+                <div>✓ Panjang kata sandi</div>
+                <div>✓ Skor dan kategori</div>
+                <div>✓ Status kebocoran</div>
+                <div>✓ Waktu analisis WIB</div>
+                <div>× Kata sandi asli tidak disimpan</div>
+                <div>× Hash kata sandi publik tidak disimpan</div>
+              </div>
             </div>
           </section>
 
-          <section className="card">
-            <h3>Riwayat Analisis Anonim</h3>
+          <section className="glass-card">
+            <div className="card-heading">
+              <div>
+                <p className="section-kicker">Riwayat</p>
+                <h2>Analisis Anonim Terbaru</h2>
+              </div>
+              <span className="muted-text">Maksimal 50 data terbaru</span>
+            </div>
 
-            <div className="table-wrapper">
-              <table>
+            <div className="table-shell">
+              <table className="modern-table">
                 <thead>
                   <tr>
                     <th>ID</th>
@@ -181,7 +224,7 @@ export default function Dashboard() {
                     <th>Kategori</th>
                     <th>Status Bocor</th>
                     <th>Jumlah Bocor</th>
-                    <th>Status HIBP</th>
+                    <th>HIBP</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -191,18 +234,34 @@ export default function Dashboard() {
                         <td>{item.id}</td>
                         <td>{item.created_at}</td>
                         <td>{item.password_length}</td>
-                        <td>{item.score}</td>
-                        <td>{item.category}</td>
-                        <td>{item.is_breached ? "Bocor" : "Tidak Bocor"}</td>
                         <td>
-                          {Number(item.breach_count || 0).toLocaleString(
-                            "id-ID",
-                          )}
+                          <strong>{item.score}</strong>
                         </td>
                         <td>
-                          {item.hibp_status === "checked"
-                            ? "Berhasil"
-                            : "Gagal"}
+                          <StatusBadge
+                            variant={getCategoryClass(item.category)}
+                          >
+                            {item.category}
+                          </StatusBadge>
+                        </td>
+                        <td>
+                          {item.is_breached ? (
+                            <StatusBadge variant="danger">Bocor</StatusBadge>
+                          ) : (
+                            <StatusBadge variant="success">
+                              Tidak Bocor
+                            </StatusBadge>
+                          )}
+                        </td>
+                        <td>{formatNumber(item.breach_count)}</td>
+                        <td>
+                          {item.hibp_status === "checked" ? (
+                            <StatusBadge variant="success">
+                              Berhasil
+                            </StatusBadge>
+                          ) : (
+                            <StatusBadge variant="warning">Gagal</StatusBadge>
+                          )}
                         </td>
                       </tr>
                     ))

@@ -51,15 +51,22 @@ export default function Login() {
   }
 
   return (
-    <main className="page auth-page">
-      <section className="card auth-card">
-        <p className="eyebrow">Admin SANDIKU</p>
-        <h1>Login Admin</h1>
-        <p className="muted">
-          Masuk untuk melihat statistik analisis kata sandi secara anonim.
+    <main className="auth-shell">
+      <section className="auth-panel glass-card">
+        <div className="auth-brand">
+          <span className="brand-mark large">S</span>
+          <div>
+            <p className="section-kicker">Admin Access</p>
+            <h1>Masuk Dashboard</h1>
+          </div>
+        </div>
+
+        <p className="auth-desc">
+          Gunakan akun admin untuk mengakses statistik analisis kata sandi
+          secara anonim.
         </p>
 
-        <form onSubmit={handleLogin} className="form">
+        <form onSubmit={handleLogin} className="modern-form">
           <label htmlFor="email">Email Admin</label>
           <input
             id="email"
@@ -70,7 +77,7 @@ export default function Login() {
           />
 
           <label htmlFor="password">Password Admin</label>
-          <div className="password-input-group">
+          <div className="password-field">
             <input
               id="password"
               type={showPassword ? "text" : "password"}
@@ -81,19 +88,27 @@ export default function Login() {
 
             <button
               type="button"
-              className="secondary-button"
               onClick={() => setShowPassword((current) => !current)}
             >
               {showPassword ? "Sembunyikan" : "Tampilkan"}
             </button>
           </div>
 
-          {errorMessage && <div className="alert danger">{errorMessage}</div>}
+          {errorMessage && <div className="form-alert">{errorMessage}</div>}
 
-          <button className="primary-button" type="submit" disabled={loading}>
-            {loading ? "Memproses..." : "Masuk"}
+          <button
+            className="btn btn-primary full-width"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "Memeriksa..." : "Masuk"}
           </button>
         </form>
+
+        <div className="privacy-banner">
+          Akses dashboard dilindungi token JWT dan hanya tersedia untuk admin
+          aktif.
+        </div>
       </section>
     </main>
   );

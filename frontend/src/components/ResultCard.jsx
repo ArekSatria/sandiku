@@ -1,33 +1,72 @@
-import StrengthMeter from "./StrengthMeter";
+import ScoreRing from "./ScoreRing";
+import StatusBadge from "./StatusBadge";
 
-function BreachStatus({ result }) {
+function getCategoryVariant(category) {
+  return String(category || "")
+    .toLowerCase()
+    .replace(/\s+/g, "-");
+}
+
+function BreachPanel({ result }) {
   if (!result) return null;
 
   if (result.hibp_status === "failed") {
     return (
-      <div className="alert warning">
-        Pemeriksaan kebocoran melalui Have I Been Pwned gagal dilakukan. Ulangi
-        pemeriksaan ketika koneksi stabil.
+      <div className="info-panel warning-panel">
+        <div className="panel-icon">!</div>
+        <div>
+          <h4>Pemeriksaan Kebocoran Gagal</h4>
+          <p>
+            Sistem tidak berhasil menghubungi layanan Have I Been Pwned. Ulangi
+            pemeriksaan ketika koneksi stabil sebelum menyimpulkan kata sandi
+            aman dari riwayat kebocoran.
+          </p>
+        </div>
       </div>
     );
   }
 
   if (result.is_breached) {
     return (
-      <div className="alert danger">
-        Kata sandi ini ditemukan dalam basis data kebocoran publik sebanyak{" "}
-        <strong>
-          {Number(result.breach_count || 0).toLocaleString("id-ID")}
-        </strong>{" "}
-        kali. Jangan gunakan kata sandi ini.
+      <div className="info-panel danger-panel">
+        <div className="panel-icon">×</div>
+        <div>
+          <h4>Kata Sandi Pernah Bocor</h4>
+          <p>
+            Kata sandi ini ditemukan dalam basis data kebocoran publik sebanyak{" "}
+            <strong>
+              {Number(result.breach_count || 0).toLocaleString("id-ID")}
+            </strong>{" "}
+            kali. Kata sandi ini tidak layak digunakan.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="alert success">
-      Kata sandi tidak terindikasi muncul dalam basis data kebocoran publik
-      berdasarkan pemeriksaan HIBP.
+    <div className="info-panel success-panel">
+      <div className="panel-icon">✓</div>
+      <div>
+        <h4>Tidak Terindikasi Bocor</h4>
+        <p>
+          Kata sandi tidak ditemukan dalam basis data kebocoran publik
+          berdasarkan pemeriksaan HIBP.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function EmptyResult() {
+  return (
+    <div className="result-empty">
+      <div className="empty-orb">S</div>
+      <h3>Belum Ada Hasil Analisis</h3>
+      <p>
+        Masukkan kata sandi untuk melihat skor, kategori, status kebocoran, pola
+        kelemahan, dan rekomendasi perbaikannya.
+      </p>
     </div>
   );
 }
@@ -35,80 +74,93 @@ function BreachStatus({ result }) {
 export default function ResultCard({ result }) {
   if (!result) {
     return (
-      <div className="card empty-state">
-        <h3>Belum ada hasil analisis</h3>
-        <p>
-          Masukkan kata sandi untuk melihat skor, kategori, kelemahan, dan
-          rekomendasi perbaikannya.
-        </p>
-      </div>
+      <section className="glass-card result-card">
+        <EmptyResult />
+      </section>
     );
   }
 
+  const categoryVariant = getCategoryVariant(result.category);
+
   return (
-    <div className="card result-card">
-      <div className="result-header">
+    <section className="glass-card result-card">
+      <div className="result-topbar">
         <div>
-          <h3>Hasil Analisis Kata Sandi</h3>
-          <p className="muted">Waktu analisis: {result.created_at}</p>
+          <p className="section-kicker">Hasil Analisis</p>
+          <h2>Kekuatan Kata Sandi</h2>
+          <span className="muted-text">
+            Dianalisis pada {result.created_at}
+          </span>
         </div>
 
-        <span
-          className={`badge badge-${String(result.category).toLowerCase().replaceAll(" ", "-")}`}
-        >
-          {result.category}
-        </span>
+        <StatusBadge variant={categoryVariant}>{result.category}</StatusBadge>
       </div>
 
-      <StrengthMeter score={result.score} category={result.category} />
+      <div className="result-summary">
+        <ScoreRing score={result.score} category={result.category} />
 
-      <div className="result-grid">
-        <div className="metric-box">
-          <span>Panjang Kata Sandi</span>
-          <strong>{result.password_length} karakter</strong>
-        </div>
-
-        <div className="metric-box">
-          <span>Status HIBP</span>
-          <strong>
-            {result.hibp_status === "checked"
-              ? "Berhasil Diperiksa"
-              : "Gagal Diperiksa"}
-          </strong>
-        </div>
-
-        <div className="metric-box">
-          <span>Jumlah Kebocoran</span>
-          <strong>
-            {Number(result.breach_count || 0).toLocaleString("id-ID")}
-          </strong>
+        <div className="mini-metrics">
+          <div>
+            <span>Panjang</span>
+            <strong>{result.password_length} karakter</strong>
+          </div>
+          <div>
+            <span>Status HIBP</span>
+            <strong>
+              {result.hibp_status === "checked" ? "Berhasil" : "Gagal"}
+            </strong>
+          </div>
+          <div>
+            <span>Jumlah Bocor</span>
+            <strong>
+              {Number(result.breach_count || 0).toLocaleString("id-ID")}
+            </strong>
+          </div>
         </div>
       </div>
 
-      <BreachStatus result={result} />
+      <BreachPanel result={result} />
 
-      <div className="analysis-section">
-        <h4>Kelemahan yang Terdeteksi</h4>
-        <ul>
-          {(result.detected_patterns || []).map((item, index) => (
-            <li key={`pattern-${index}`}>{item}</li>
-          ))}
-        </ul>
+      <div className="result-lists">
+        <div>
+          <h3>Kelemahan Terdeteksi</h3>
+
+          {result.detected_patterns?.length ? (
+            <ul className="clean-list">
+              {result.detected_patterns.map((item, index) => (
+                <li key={`pattern-${index}`}>{item}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="muted-text">
+              Tidak ada kelemahan dominan yang terdeteksi.
+            </p>
+          )}
+        </div>
+
+        <div>
+          <h3>Rekomendasi Perbaikan</h3>
+
+          {result.recommendations?.length ? (
+            <ul className="clean-list">
+              {result.recommendations.map((item, index) => (
+                <li key={`recommendation-${index}`}>{item}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="muted-text">
+              Gunakan kata sandi unik dan jangan gunakan ulang pada layanan
+              lain.
+            </p>
+          )}
+        </div>
       </div>
 
-      <div className="analysis-section">
-        <h4>Rekomendasi Perbaikan</h4>
-        <ul>
-          {(result.recommendations || []).map((item, index) => (
-            <li key={`recommendation-${index}`}>{item}</li>
-          ))}
-        </ul>
+      <div className="privacy-banner">
+        <strong>Privasi dijaga.</strong> Sistem hanya menyimpan metadata anonim,
+        seperti panjang kata sandi, skor, kategori, status kebocoran, dan waktu
+        analisis. Kata sandi asli tidak disimpan.
       </div>
-
-      <div className="privacy-note">
-        Sistem hanya menyimpan metadata anonim seperti skor, kategori, panjang
-        kata sandi, dan waktu analisis. Kata sandi asli tidak disimpan.
-      </div>
-    </div>
+    </section>
   );
 }

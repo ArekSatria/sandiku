@@ -2,94 +2,99 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+export default function Login() {
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const [email, setEmail] = useState("admin@sandiku.local");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleLogin(event) {
+    event.preventDefault();
+
+    setErrorMessage("");
+
+    if (!email.trim() || !password.trim()) {
+      setErrorMessage("Email dan password wajib diisi.");
+      return;
+    }
+
     setLoading(true);
-    setError("");
 
     try {
-      // Menembak endpoint autentikasi login admin di backend
-      const response = await api.post("/api/auth/login", { email, password });
+      const response = await api.post("/api/auth/login", {
+        email,
+        password,
+      });
 
-      // Simpan token JWT yang diberikan backend ke localStorage browser
-      localStorage.setItem("token", response.data.access_token);
+      localStorage.setItem("sandiku_token", response.data.access_token);
 
-      // Alihkan halaman ke Dashboard Statistik Admin
+      const profileResponse = await api.get("/api/auth/me");
+      localStorage.setItem(
+        "sandiku_admin",
+        JSON.stringify(profileResponse.data),
+      );
+
       navigate("/dashboard");
-      window.location.reload(); // Refresh untuk memperbarui status menu Navbar
-    } catch (err) {
-      if (err.response && err.response.data.detail) {
-        setError(err.response.data.detail);
-      } else {
-        setError("Gagal terhubung ke server. Pastikan backend menyala.");
-      }
+    } catch (error) {
+      const detail = error?.response?.data?.detail;
+      setErrorMessage(
+        typeof detail === "string"
+          ? detail
+          : "Login gagal. Periksa email dan password admin.",
+      );
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-5">
-          <div className="card shadow-sm border-0 mt-5">
-            <div className="card-body p-4">
-              <h3 className="fw-bold text-center mb-4">Login Admin Sandiku</h3>
+    <main className="page auth-page">
+      <section className="card auth-card">
+        <p className="eyebrow">Admin SANDIKU</p>
+        <h1>Login Admin</h1>
+        <p className="muted">
+          Masuk untuk melihat statistik analisis kata sandi secara anonim.
+        </p>
 
-              {error && (
-                <div className="alert alert-danger text-center small py-2">
-                  {error}
-                </div>
-              )}
+        <form onSubmit={handleLogin} className="form">
+          <label htmlFor="email">Email Admin</label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="admin@sandiku.local"
+          />
 
-              <form onSubmit={handleLogin}>
-                <div className="mb-3">
-                  <label className="form-label small fw-bold text-muted">
-                    Alamat Email
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    placeholder="admin@sandiku.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="form-label small fw-bold text-muted">
-                    Kata Sandi
-                  </label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    placeholder="********"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="btn btn-dark w-100 fw-bold"
-                  disabled={loading}
-                >
-                  {loading ? "Memverifikasi..." : "Masuk Aplikasi"}
-                </button>
-              </form>
-            </div>
+          <label htmlFor="password">Password Admin</label>
+          <div className="password-input-group">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Masukkan password admin"
+            />
+
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setShowPassword((current) => !current)}
+            >
+              {showPassword ? "Sembunyikan" : "Tampilkan"}
+            </button>
           </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
-export default Login;
+          {errorMessage && <div className="alert danger">{errorMessage}</div>}
+
+          <button className="primary-button" type="submit" disabled={loading}>
+            {loading ? "Memproses..." : "Masuk"}
+          </button>
+        </form>
+      </section>
+    </main>
+  );
+}

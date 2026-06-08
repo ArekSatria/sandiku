@@ -2,203 +2,221 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
-const Dashboard = () => {
-  const [stats, setStats] = useState(null);
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+function StatCard({ title, value, description }) {
+  return (
+    <div className="stat-card">
+      <span>{title}</span>
+      <strong>{value}</strong>
+      {description && <p>{description}</p>}
+    </div>
+  );
+}
+
+export default function Dashboard() {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const statsRes = await api.get("/api/dashboard/statistics");
-        setStats(statsRes.data);
-        const historyRes = await api.get("/api/dashboard/analyses");
-        setHistory(historyRes.data);
-      } catch (err) {
-        console.error(err);
-        setError("Gagal memuat data. Sesi Anda mungkin telah berakhir.");
-      } finally {
-        setLoading(false);
+  const [admin, setAdmin] = useState(null);
+  const [statistics, setStatistics] = useState(null);
+  const [analyses, setAnalyses] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  function handleLogout() {
+    localStorage.removeItem("sandiku_token");
+    localStorage.removeItem("sandiku_admin");
+    navigate("/login");
+  }
+
+  async function fetchDashboardData() {
+    setLoading(true);
+    setErrorMessage("");
+
+    try {
+      const [profileResponse, statsResponse, analysesResponse] =
+        await Promise.all([
+          api.get("/api/auth/me"),
+          api.get("/api/dashboard/statistics"),
+          api.get("/api/dashboard/analyses"),
+        ]);
+
+      setAdmin(profileResponse.data);
+      setStatistics(statsResponse.data);
+      setAnalyses(analysesResponse.data || []);
+    } catch (error) {
+      const detail = error?.response?.data?.detail;
+
+      setErrorMessage(
+        typeof detail === "string"
+          ? detail
+          : "Gagal memuat dashboard. Silakan login ulang.",
+      );
+
+      if (error?.response?.status === 401 || error?.response?.status === 403) {
+        localStorage.removeItem("sandiku_token");
+        localStorage.removeItem("sandiku_admin");
+        navigate("/login");
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
     fetchDashboardData();
   }, []);
 
-  if (loading)
-    return (
-      <div className="container mt-5 pt-5 text-center text-muted fade-in-up">
-        Memuat Dasbor Metrik...
-      </div>
-    );
-  if (error)
-    return (
-      <div className="container mt-5">
-        <div className="alert alert-danger border-0 shadow-sm">{error}</div>
-      </div>
-    );
+  const totalAnalyses = statistics?.total_analyses || 0;
+  const averageScore = statistics?.average_score || 0;
+  const breachedCount = statistics?.breached_count || 0;
+  const hibpFailedCount = statistics?.hibp_failed_count || 0;
+  const totalBreachHits = statistics?.total_breach_hits || 0;
 
   return (
-    <div className="container mt-5 mb-5 fade-in-up">
-      <div className="d-flex justify-content-between align-items-end mb-5">
+    <main className="page">
+      <section className="dashboard-header">
         <div>
-          <h2
-            className="fw-bolder text-dark mb-1"
-            style={{ letterSpacing: "-0.5px" }}
-          >
-            Tinjauan Sistem
-          </h2>
-          <p className="text-muted mb-0">
-            Statistik anonim pengujian kredensial masyarakat.
+          <p className="eyebrow">Dashboard Admin</p>
+          <h1>Statistik Analisis SANDIKU</h1>
+          <p className="muted">
+            Data yang ditampilkan bersifat anonim dan tidak memuat kata sandi
+            asli pengguna.
           </p>
+          {admin && (
+            <p className="muted">
+              Login sebagai: <strong>{admin.name}</strong> ({admin.email})
+            </p>
+          )}
         </div>
-      </div>
 
-      {/* KPI Cards Clean Design */}
-      <div className="row g-4 mb-5">
-        <div className="col-md-4">
-          <div className="ultra-card p-4 d-flex align-items-center">
-            <div
-              className="bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center me-4"
-              style={{ width: "60px", height: "60px" }}
-            >
-              <i className="bi bi-activity fs-3"></i>
-            </div>
-            <div>
-              <p className="text-muted small fw-bold mb-0 text-uppercase tracking-wide">
-                Total Audit
-              </p>
-              <h2 className="fw-bolder text-dark mb-0">
-                {stats?.total_analyses.toLocaleString("id-ID")}
-              </h2>
-            </div>
-          </div>
+        <div className="dashboard-actions">
+          <button className="secondary-button" onClick={fetchDashboardData}>
+            Muat Ulang
+          </button>
+          <button className="danger-button" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
-        <div className="col-md-4">
-          <div className="ultra-card p-4 d-flex align-items-center">
-            <div
-              className="bg-success bg-opacity-10 text-success rounded-circle d-flex justify-content-center align-items-center me-4"
-              style={{ width: "60px", height: "60px" }}
-            >
-              <i className="bi bi-bullseye fs-3"></i>
-            </div>
-            <div>
-              <p className="text-muted small fw-bold mb-0 text-uppercase tracking-wide">
-                Rata-rata Skor
-              </p>
-              <h2 className="fw-bolder text-dark mb-0">
-                {stats?.average_score}
-                <span className="fs-5 text-muted fw-normal">/100</span>
-              </h2>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-4">
-          <div className="ultra-card p-4 d-flex align-items-center">
-            <div
-              className="bg-danger bg-opacity-10 text-danger rounded-circle d-flex justify-content-center align-items-center me-4"
-              style={{ width: "60px", height: "60px" }}
-            >
-              <i className="bi bi-shield-x fs-3"></i>
-            </div>
-            <div>
-              <p className="text-muted small fw-bold mb-0 text-uppercase tracking-wide">
-                Insiden Bocor
-              </p>
-              <h2 className="fw-bolder text-dark mb-0">
-                {stats?.breached_count.toLocaleString("id-ID")}
-              </h2>
-            </div>
-          </div>
-        </div>
-      </div>
+      </section>
 
-      {/* Tabel Log Clean */}
-      <div className="ultra-card p-0 overflow-hidden">
-        <div className="p-4 border-bottom bg-white">
-          <h6 className="fw-bold text-dark mb-0">
-            Log Analisis Kredensial Terbaru (Anonim)
-          </h6>
+      {errorMessage && <div className="alert danger">{errorMessage}</div>}
+
+      {loading ? (
+        <div className="card">
+          <p>Memuat data dashboard...</p>
         </div>
-        <div className="table-responsive">
-          <table className="table table-hover table-borderless align-middle mb-0 text-secondary">
-            <thead className="bg-light" style={{ fontSize: "0.85rem" }}>
-              <tr>
-                <th className="ps-4 py-3 fw-semibold" style={{ width: "10%" }}>
-                  ID
-                </th>
-                <th className="py-3 fw-semibold" style={{ width: "15%" }}>
-                  Panjang
-                </th>
-                <th className="py-3 fw-semibold" style={{ width: "15%" }}>
-                  Skor
-                </th>
-                {/* Memberikan ruang yang cukup untuk klasifikasi agar tidak mendesak kolom lain */}
-                <th className="py-3 fw-semibold" style={{ width: "30%" }}>
-                  Klasifikasi
-                </th>
-                <th className="py-3 fw-semibold" style={{ width: "15%" }}>
-                  Integritas
-                </th>
-                <th
-                  className="pe-4 py-3 fw-semibold text-end"
-                  style={{ width: "15%" }}
-                >
-                  Waktu (WIB)
-                </th>
-              </tr>
-            </thead>
-            <tbody style={{ fontSize: "0.9rem" }}>
-              {history.map((log) => (
-                <tr key={log.id} className="border-bottom border-light">
-                  <td className="ps-4 py-3 fw-semibold text-dark">#{log.id}</td>
-                  <td className="py-3">
-                    {log.password_length}{" "}
-                    <span className="text-muted">char</span>
-                  </td>
-                  <td className="py-3 fw-bold text-dark">{log.score}</td>
-                  <td className="py-3">
-                    <span
-                      className={`ultra-badge bg-${log.score > 60 ? "success" : log.score > 25 ? "warning" : "danger"} bg-opacity-10 text-${log.score > 60 ? "success" : log.score > 25 ? "warning" : "danger"}`}
-                    >
-                      {log.category}
-                    </span>
-                  </td>
-                  <td className="py-3">
-                    {log.is_breached ? (
-                      <span className="text-danger d-flex align-items-center">
-                        <i className="bi bi-x-circle-fill me-2"></i> Bocor
-                      </span>
-                    ) : (
-                      <span className="text-success d-flex align-items-center">
-                        <i className="bi bi-check-circle-fill me-2"></i> Aman
-                      </span>
-                    )}
-                  </td>
-                  <td className="pe-4 py-3 text-end text-muted">
-                    {new Date(log.created_at).toLocaleString("id-ID", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      day: "numeric",
-                      month: "short",
-                    })}
-                  </td>
-                </tr>
-              ))}
-              {history.length === 0 && (
-                <tr>
-                  <td colSpan="6" className="text-center py-5 text-muted">
-                    Tidak ada aktivitas tercatat.
-                  </td>
-                </tr>
+      ) : (
+        <>
+          <section className="stats-grid">
+            <StatCard
+              title="Total Analisis"
+              value={totalAnalyses.toLocaleString("id-ID")}
+              description="Jumlah seluruh pengujian kata sandi"
+            />
+
+            <StatCard
+              title="Rata-rata Skor"
+              value={Number(averageScore).toLocaleString("id-ID")}
+              description="Skor rata-rata dari seluruh analisis"
+            />
+
+            <StatCard
+              title="Password Bocor"
+              value={breachedCount.toLocaleString("id-ID")}
+              description="Jumlah kata sandi yang terindikasi bocor"
+            />
+
+            <StatCard
+              title="Total Jejak Kebocoran"
+              value={totalBreachHits.toLocaleString("id-ID")}
+              description="Akumulasi breach_count dari HIBP"
+            />
+
+            <StatCard
+              title="HIBP Gagal"
+              value={hibpFailedCount.toLocaleString("id-ID")}
+              description="Jumlah pemeriksaan HIBP yang gagal"
+            />
+          </section>
+
+          <section className="layout-two">
+            <div className="card">
+              <h3>Distribusi Kategori</h3>
+
+              {statistics?.category_distribution?.length ? (
+                <div className="category-list">
+                  {statistics.category_distribution.map((item) => (
+                    <div className="category-row" key={item.category}>
+                      <span>{item.category}</span>
+                      <strong>{item.total}</strong>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="muted">Belum ada data kategori.</p>
               )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-};
+            </div>
 
-export default Dashboard;
+            <div className="card">
+              <h3>Catatan Privasi</h3>
+              <p>
+                Dashboard hanya menampilkan metadata anonim, seperti panjang
+                kata sandi, skor, kategori, status kebocoran, dan waktu
+                analisis. Sistem tidak menyimpan kata sandi asli maupun hash
+                kata sandi publik.
+              </p>
+            </div>
+          </section>
+
+          <section className="card">
+            <h3>Riwayat Analisis Anonim</h3>
+
+            <div className="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Waktu</th>
+                    <th>Panjang</th>
+                    <th>Skor</th>
+                    <th>Kategori</th>
+                    <th>Status Bocor</th>
+                    <th>Jumlah Bocor</th>
+                    <th>Status HIBP</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {analyses.length ? (
+                    analyses.map((item) => (
+                      <tr key={item.id}>
+                        <td>{item.id}</td>
+                        <td>{item.created_at}</td>
+                        <td>{item.password_length}</td>
+                        <td>{item.score}</td>
+                        <td>{item.category}</td>
+                        <td>{item.is_breached ? "Bocor" : "Tidak Bocor"}</td>
+                        <td>
+                          {Number(item.breach_count || 0).toLocaleString(
+                            "id-ID",
+                          )}
+                        </td>
+                        <td>
+                          {item.hibp_status === "checked"
+                            ? "Berhasil"
+                            : "Gagal"}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="8">Belum ada riwayat analisis.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </>
+      )}
+    </main>
+  );
+}

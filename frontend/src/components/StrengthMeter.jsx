@@ -1,27 +1,32 @@
-const StrengthMeter = ({ score }) => {
-  let bgColor = "bg-danger"; // Sangat Lemah / Lemah
-  if (score > 40 && score <= 60) bgColor = "bg-warning"; // Sedang
-  if (score > 60 && score <= 80) bgColor = "bg-info"; // Kuat
-  if (score > 80) bgColor = "bg-success"; // Sangat Kuat
+function getStrengthColorClass(score) {
+  if (score <= 20) return "strength-fill danger";
+  if (score <= 40) return "strength-fill weak";
+  if (score <= 60) return "strength-fill medium";
+  if (score <= 80) return "strength-fill strong";
+  return "strength-fill excellent";
+}
+
+export default function StrengthMeter({
+  score = 0,
+  category = "Belum Dianalisis",
+}) {
+  const safeScore = Math.max(0, Math.min(100, Number(score) || 0));
 
   return (
-    <div className="mt-3">
-      <div className="d-flex justify-content-between mb-1">
-        <span className="fw-bold text-muted small">Indikator Kekuatan:</span>
-        <span className="fw-bold small">{score}/100</span>
+    <div className="strength-meter">
+      <div className="strength-header">
+        <span>Skor Kekuatan</span>
+        <strong>{safeScore}/100</strong>
       </div>
-      <div className="progress" style={{ height: "10px" }}>
+
+      <div className="strength-track">
         <div
-          className={`progress-bar ${bgColor} progress-bar-striped progress-bar-animated`}
-          role="progressbar"
-          style={{ width: `${score}%` }}
-          aria-valuenow={score}
-          aria-valuemin="0"
-          aria-valuemax="100"
-        ></div>
+          className={getStrengthColorClass(safeScore)}
+          style={{ width: `${safeScore}%` }}
+        />
       </div>
+
+      <div className="strength-category">{category}</div>
     </div>
   );
-};
-
-export default StrengthMeter;
+}

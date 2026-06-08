@@ -1,31 +1,22 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+
 import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Analyzer from "./pages/Analyzer";
-import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
 
-// Fungsi pelindung rute agar Dashboard tidak bisa ditembus sembarang orang tanpa token
-const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
-  return token ? children : <Navigate to="/login" replace />;
-};
-
-function App() {
+export default function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Navbar />
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/analyzer" element={<Analyzer />} />
         <Route path="/login" element={<Login />} />
 
-        {/* Melindungi halaman Dashboard menggunakan elemen rute terproteksi */}
         <Route
           path="/dashboard"
           element={
@@ -34,12 +25,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* Fallback ke beranda jika mengetik url ngawur */}
-        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
-
-export default App;

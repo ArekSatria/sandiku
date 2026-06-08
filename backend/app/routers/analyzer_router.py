@@ -3,6 +3,7 @@ import json
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.core.rate_limiter import rate_limit_analyze
 from app.database import get_db
 from app.models.analysis_log import AnalysisLog
 from app.schemas.analyzer_schema import PasswordRequest, PasswordResponse
@@ -12,7 +13,12 @@ from app.utils.timezone import format_datetime_indonesia
 router = APIRouter()
 
 
-@router.post("/api/analyze", response_model=PasswordResponse, tags=["Password Analyzer"])
+@router.post(
+    "/api/analyze",
+    response_model=PasswordResponse,
+    tags=["Password Analyzer"],
+    dependencies=[Depends(rate_limit_analyze)],
+)
 def analyze_password_endpoint(request: PasswordRequest, db: Session = Depends(get_db)):
     """Menganalisis kata sandi dan menyimpan metadata anonim.
 

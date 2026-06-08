@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_admin
+from app.core.rate_limiter import rate_limit_login
 from app.core.security import create_access_token, verify_password
 from app.database import get_db
 from app.models.user import User
@@ -10,7 +11,12 @@ from app.schemas.auth_schema import LoginRequest, TokenResponse, UserResponse
 router = APIRouter()
 
 
-@router.post("/api/auth/login", response_model=TokenResponse, tags=["Authentication"])
+@router.post(
+    "/api/auth/login",
+    response_model=TokenResponse,
+    tags=["Authentication"],
+    dependencies=[Depends(rate_limit_login)],
+)
 def login_admin(request: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == request.email).first()
 

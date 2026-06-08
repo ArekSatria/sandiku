@@ -40,3 +40,9 @@ Laporan harus menuliskan bahwa implementasi saat ini menggunakan SQLite sebagai 
 Laporan juga dapat mencantumkan hasil pengujian otomatis backend: 30 test berhasil dengan coverage 85%.
 
 Jika deployment online belum dilakukan, laporan tidak boleh menyatakan bahwa sistem sudah berhasil dideploy. Bagian deployment cukup ditulis sebagai rencana deployment.
+
+## Security Hardening
+
+Penguatan keamanan dasar telah ditambahkan pada backend SANDIKU. Perubahan meliputi rate limiting pada endpoint login dan analisis, middleware security headers, pembatasan CORS yang lebih ketat, konfigurasi production mode, serta opsi menonaktifkan Swagger UI melalui environment variable.
+
+Security hardening ini mendukung klaim bahwa sistem telah menerapkan perlindungan dasar pada aspek autentikasi, privasi data, pembatasan akses, dan pengendalian request.

@@ -5,20 +5,26 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+from app.core.rate_limiter import reset_rate_limiters
+from app.core.security import get_password_hash
+from app.core.security_headers import SecurityHeadersMiddleware
 from app.database import Base, get_db
 from app.models.analysis_log import AnalysisLog
 from app.models.user import User
 from app.routers import analyzer_router, auth_router, dashboard_router
-from app.core.security import get_password_hash
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limit_state():
+    """Membersihkan state rate limiter sebelum dan sesudah setiap test."""
+    reset_rate_limiters()
+    yield
+    reset_rate_limiters()
 
 
 @pytest.fixture()
 def db_session():
-    """Membuat database SQLite in-memory khusus testing.
-
-    Database ini tidak memakai sandiku.db asli, sehingga pengujian tidak
-    merusak data pengembangan lokal.
-    """
+    """Membuat database SQLite in-memory khusus testing."""
     engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},
@@ -48,6 +54,8 @@ def test_app(db_session):
     """Membuat instance FastAPI khusus untuk testing."""
     app = FastAPI(title="SANDIKU Test API")
 
+    app.add_middleware(SecurityHeadersMiddleware)
+
     app.include_router(analyzer_router.router)
     app.include_router(auth_router.router)
     app.include_router(dashboard_router.router)
@@ -69,7 +77,6 @@ def client(test_app):
 
 @pytest.fixture()
 def admin_user(db_session):
-    """Membuat admin aktif untuk kebutuhan pengujian login dan dashboard."""
     user = User(
         name="Admin Test",
         email="admin@test.local",
@@ -86,7 +93,6 @@ def admin_user(db_session):
 
 @pytest.fixture()
 def inactive_admin(db_session):
-    """Membuat admin nonaktif untuk menguji proteksi login."""
     user = User(
         name="Inactive Admin",
         email="inactive@test.local",

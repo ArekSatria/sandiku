@@ -47,6 +47,10 @@ CORS_ORIGINS = [
     if origin.strip()
 ]
 
+ADMIN_NAME = os.getenv("ADMIN_NAME", "Administrator")
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@sandiku.local")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "")
+
 # Security headers.
 SECURITY_HEADERS_ENABLED = get_bool_env("SECURITY_HEADERS_ENABLED", True)
 

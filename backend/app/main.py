@@ -1,12 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.core.admin_bootstrap import ensure_admin_from_env
 from app.core.config import CORS_ORIGINS, ENABLE_DOCS
 from app.core.db_init import init_database
 from app.core.security_headers import SecurityHeadersMiddleware
 from app.routers import analyzer_router, auth_router, dashboard_router
 
 init_database()
+ensure_admin_from_env()
 
 app = FastAPI(
     title="SANDIKU API",
@@ -37,4 +39,12 @@ def read_root():
     return {
         "status": "success",
         "message": "API SANDIKU aktif dan berjalan dengan baik.",
+    }
+
+
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "service": "SANDIKU API",
     }

@@ -1,15 +1,21 @@
 import axios from "axios";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+
 const api = axios.create({
-  baseURL: "http://127.0.0.1:8000",
+  baseURL: API_BASE_URL,
+  timeout: 15000,
 });
 
-// Interceptor: Otomatis menyisipkan Token JWT jika admin sedang login
+// Interceptor: menyisipkan token JWT jika admin sedang login.
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
   return config;
 });
 

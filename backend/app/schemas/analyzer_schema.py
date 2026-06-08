@@ -1,12 +1,18 @@
-from pydantic import BaseModel
-from typing import List
 from datetime import datetime
+from typing import List, Literal
 
-# Skema untuk menerima input kata sandi dari pengguna
+from pydantic import BaseModel, Field
+
+
 class PasswordRequest(BaseModel):
-    password: str
+    password: str = Field(
+        ...,
+        min_length=1,
+        max_length=128,
+        description="Kata sandi yang akan dianalisis. Tidak disimpan dalam database.",
+    )
 
-# Skema untuk mengirimkan hasil analisis ke pengguna
+
 class PasswordResponse(BaseModel):
     id: int
     score: int
@@ -14,6 +20,7 @@ class PasswordResponse(BaseModel):
     password_length: int
     is_breached: bool
     breach_count: int
+    hibp_status: Literal["checked", "failed"]
     detected_patterns: List[str]
     recommendations: List[str]
     created_at: datetime

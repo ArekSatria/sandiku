@@ -1,24 +1,62 @@
+"""Pemeriksaan kebocoran kata sandi melalui Have I Been Pwned.
+
+Pemeriksaan memakai mekanisme k-Anonymity: aplikasi hanya mengirim lima
+karakter pertama hash SHA-1 ke HIBP, bukan kata sandi asli.
+"""
+
 import hashlib
+from typing import Literal, TypedDict
+
 import requests
 
+
+class HibpResult(TypedDict):
+    is_breached: bool
+    breach_count: int
+    check_status: Literal["checked", "failed"]
+    error: str | None
+
+
 class HibpChecker:
+    API_URL = "https://api.pwnedpasswords.com/range/{prefix}"
+
     @staticmethod
-    def check_breached_password(password: str) -> tuple[bool, int]:
-        # Hash password dengan SHA-1
-        sha1_password = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
-        # Ambil 5 karakter pertama untuk dikirim (k-anonymity)
+    def check_breached_password(password: str, timeout: int = 5) -> HibpResult:
+        sha1_password = hashlib.sha1(password.encode("utf-8")).hexdigest().upper()
         prefix, suffix = sha1_password[:5], sha1_password[5:]
-        
+
         try:
-            response = requests.get(f"https://api.pwnedpasswords.com/range/{prefix}")
-            if response.status_code != 200:
-                return False, 0
-            
-            # Cek apakah suffix (sisa hash) ada di data kebocoran
-            hashes = (line.split(':') for line in response.text.splitlines())
-            for h, count in hashes:
-                if h == suffix:
-                    return True, int(count) # Mengembalikan True dan jumlah kebocoran
-            return False, 0
-        except Exception:
-            return False, 0
+            response = requests.get(
+                HibpChecker.API_URL.format(prefix=prefix),
+                timeout=timeout,
+                headers={"User-Agent": "SANDIKU-Password-Analyzer"},
+            )
+            response.raise_for_status()
+        except requests.RequestException as exc:
+            return {
+                "is_breached": False,
+                "breach_count": 0,
+                "check_status": "failed",
+                "error": str(exc),
+            }
+
+        for line in response.text.splitlines():
+            try:
+                hash_suffix, count = line.split(":")
+            except ValueError:
+                continue
+
+            if hash_suffix == suffix:
+                return {
+                    "is_breached": True,
+                    "breach_count": int(count),
+                    "check_status": "checked",
+                    "error": None,
+                }
+
+        return {
+            "is_breached": False,
+            "breach_count": 0,
+            "check_status": "checked",
+            "error": None,
+        }

@@ -1,9 +1,33 @@
 # SANDIKU Backend
 
-Backend SANDIKU menggunakan FastAPI untuk menyediakan REST API analisis kekuatan kata sandi, autentikasi admin, dan dashboard statistik anonim.
+Backend SANDIKU dibangun menggunakan FastAPI. Backend menyediakan REST API untuk analisis kata sandi, autentikasi admin, dashboard statistik, serta penyimpanan metadata analisis secara anonim.
 
-## Cara Menjalankan Lokal
+## Teknologi Backend
 
-```bash
-cd backend
-python -m venv .venv
+- Python
+- FastAPI
+- SQLAlchemy
+- SQLite
+- JWT
+- bcrypt/passlib
+- zxcvbn
+- requests
+- pytest
+
+## Struktur Folder
+
+```txt
+backend/
+├── app/
+│   ├── core/
+│   ├── models/
+│   ├── routers/
+│   ├── schemas/
+│   ├── scripts/
+│   ├── services/
+│   └── utils/
+├── tests/
+├── .env.example
+├── requirements.txt
+├── pytest.ini
+└── README.md

@@ -69,6 +69,54 @@ export default function Dashboard() {
     }
   }
 
+  // --- FITUR BARU: EKSPOR CSV ---
+  function handleExportCSV() {
+    if (!analyses || analyses.length === 0) {
+      setErrorMessage("Tidak ada data riwayat analisis untuk diekspor.");
+      return;
+    }
+
+    const headers = [
+      "ID",
+      "Waktu Analisis",
+      "Panjang Karakter",
+      "Skor",
+      "Kategori",
+      "Status Kebocoran",
+      "Jumlah Bocor",
+      "Status HIBP",
+    ];
+
+    const rows = analyses.map((item) => [
+      item.id,
+      `"${item.created_at}"`,
+      item.password_length,
+      item.score,
+      item.category,
+      item.is_breached ? "Bocor" : "Aman",
+      item.breach_count,
+      item.hibp_status,
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) => row.join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `Laporan_Analisis_SANDIKU_${new Date().getTime()}.csv`,
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -92,6 +140,9 @@ export default function Dashboard() {
         </div>
 
         <div className="dashboard-actions">
+          <button className="btn btn-primary" onClick={handleExportCSV}>
+            Ekspor CSV
+          </button>
           <button className="btn btn-secondary" onClick={fetchDashboardData}>
             Muat Ulang
           </button>

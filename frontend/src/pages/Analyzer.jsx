@@ -1,9 +1,11 @@
 import { useState } from "react";
+
 import ResultCard from "../components/ResultCard";
 import api from "../services/api";
 
 function getErrorMessage(error) {
   const detail = error?.response?.data?.detail;
+  const status = error?.response?.status;
 
   if (Array.isArray(detail)) {
     return detail.map((item) => item.msg).join(", ");
@@ -11,6 +13,18 @@ function getErrorMessage(error) {
 
   if (typeof detail === "string") {
     return detail;
+  }
+
+  if (status === 404) {
+    return "Endpoint analisis tidak ditemukan. Periksa URL backend.";
+  }
+
+  if (status === 500) {
+    return "Terjadi kesalahan pada server backend. Periksa log backend di Vercel.";
+  }
+
+  if (!error?.response) {
+    return "Frontend tidak dapat terhubung ke backend. Periksa CORS dan VITE_API_BASE_URL.";
   }
 
   return "Analisis gagal dilakukan. Pastikan backend aktif dan koneksi stabil.";
@@ -42,9 +56,13 @@ export default function Analyzer() {
     setLoading(true);
 
     try {
-      const response = await api.post("/api/analyze", { password });
+      const response = await api.post("/api/analyze", {
+        password,
+      });
+
       setResult(response.data);
     } catch (error) {
+      console.error("Analyze error:", error);
       setErrorMessage(getErrorMessage(error));
     } finally {
       setLoading(false);
@@ -66,6 +84,7 @@ export default function Analyzer() {
         <aside className="glass-card analyzer-form-card">
           <div className="form-header">
             <span className="form-icon">⌁</span>
+
             <div>
               <h2>Form Analisis</h2>
               <p>Masukkan kata sandi yang ingin diuji.</p>
@@ -98,6 +117,13 @@ export default function Analyzer() {
               <span>Kata sandi asli tidak disimpan</span>
             </div>
 
+            <div className="privacy-note">
+              <strong>Catatan privasi:</strong> SANDIKU tidak menyimpan kata
+              sandi asli yang Anda masukkan. Sistem hanya menyimpan metadata
+              anonim seperti panjang kata sandi, skor, kategori, status
+              kebocoran, dan waktu analisis.
+            </div>
+
             {errorMessage && <div className="form-alert">{errorMessage}</div>}
 
             <button
@@ -111,6 +137,7 @@ export default function Analyzer() {
 
           <div className="analysis-hints">
             <h3>Tips kata sandi kuat</h3>
+
             <ul>
               <li>Gunakan minimal 12 karakter.</li>
               <li>Hindari nama, tanggal lahir, dan pola keyboard.</li>
@@ -119,14 +146,6 @@ export default function Analyzer() {
             </ul>
           </div>
         </aside>
-
-        <div className="alert alert-info mt-3" role="alert">
-          <strong>Catatan privasi:</strong> SANDIKU tidak menyimpan kata sandi
-          asli yang Anda masukkan. Sistem hanya menyimpan metadata anonim
-          seperti panjang kata sandi, skor, kategori, status kebocoran, dan
-          waktu analisis. Untuk keamanan, hindari memasukkan password aktif yang
-          sedang digunakan pada akun penting.
-        </div>
 
         <ResultCard result={result} />
       </section>

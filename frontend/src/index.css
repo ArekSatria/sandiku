@@ -975,3 +975,40 @@ button {
     display: flex;
   }
 }
+
+.privacy-note {
+  margin-top: 0.9rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(20, 184, 166, 0.22);
+  border-radius: 1rem;
+  background: rgba(240, 253, 250, 0.8);
+  color: #334155;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.privacy-note strong {
+  color: #0f766e;
+}
+
+.result-card {
+  max-height: calc(100vh - 8rem);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.result-card::-webkit-scrollbar {
+  width: 8px;
+}
+
+.result-card::-webkit-scrollbar-thumb {
+  background: rgba(37, 99, 235, 0.25);
+  border-radius: 999px;
+}
+
+@media (max-width: 1080px) {
+  .result-card {
+    max-height: none;
+    overflow-y: visible;
+  }
+}

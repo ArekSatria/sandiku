@@ -47,7 +47,6 @@ CORS_ORIGINS = [
     if origin.strip()
 ]
 
-
 SECURITY_HEADERS_ENABLED = get_bool_env("SECURITY_HEADERS_ENABLED", True)
 
 HSTS_ENABLED = get_bool_env("HSTS_ENABLED", APP_ENV == "production")

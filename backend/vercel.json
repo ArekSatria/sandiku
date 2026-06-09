@@ -12,8 +12,4 @@
       "dest": "index.py"
     }
   ]
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 7d2692e (fix(deploy): finalize Vercel deployment and analyzer layout)

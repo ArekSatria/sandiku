@@ -1,16 +1,8 @@
 {
-<<<<<<< HEAD
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-=======
->>>>>>> 7d2692e (fix(deploy): finalize Vercel deployment and analyzer layout)
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/:path*",
+      "destination": "/"
     }
   ]
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 7d2692e (fix(deploy): finalize Vercel deployment and analyzer layout)

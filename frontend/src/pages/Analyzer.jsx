@@ -120,6 +120,14 @@ export default function Analyzer() {
           </div>
         </aside>
 
+        <div className="alert alert-info mt-3" role="alert">
+          <strong>Catatan privasi:</strong> SANDIKU tidak menyimpan kata sandi
+          asli yang Anda masukkan. Sistem hanya menyimpan metadata anonim
+          seperti panjang kata sandi, skor, kategori, status kebocoran, dan
+          waktu analisis. Untuk keamanan, hindari memasukkan password aktif yang
+          sedang digunakan pada akun penting.
+        </div>
+
         <ResultCard result={result} />
       </section>
     </main>

@@ -15,7 +15,10 @@ export default function Login() {
     event.preventDefault();
     setErrorMessage("");
 
-    if (!email.trim() || !password.trim()) {
+    const cleanEmail = email.trim();
+    const cleanPassword = password;
+
+    if (!cleanEmail || !cleanPassword) {
       setErrorMessage("Alamat email dan kata sandi wajib diisi.");
       return;
     }
@@ -23,10 +26,27 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await api.post("/api/auth/login", { email, password });
+      // FIX: Menggunakan URLSearchParams agar dikirim sebagai x-www-form-urlencoded
+      // FastAPI OAuth2PasswordRequestForm membaca field 'username' dan 'password'
+      const params = new URLSearchParams();
+      params.append("username", cleanEmail);
+      params.append("password", cleanPassword);
+
+      const response = await api.post("/api/auth/login", params, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+
       localStorage.setItem("sandiku_token", response.data.access_token);
 
-      const profileResponse = await api.get("/api/auth/me");
+      // Ambil data profil admin menggunakan token yang baru didapat
+      const profileResponse = await api.get("/api/auth/me", {
+        headers: {
+          Authorization: `Bearer ${response.data.access_token}`,
+        },
+      });
+
       localStorage.setItem(
         "sandiku_admin",
         JSON.stringify(profileResponse.data),
@@ -48,7 +68,7 @@ export default function Login() {
   return (
     <main className="auth-shell">
       <section className="auth-panel-horizontal glass-card">
-        {/* BAGIAN KIRI: BRANDING (Diperkecil) */}
+        {/* BAGIAN KIRI: BRANDING */}
         <div className="auth-brand-side">
           <span className="brand-mark-giant">
             <i className="bi bi-shield-lock-fill"></i>

@@ -204,7 +204,7 @@ SANDIKU tidak menyimpan kata sandi asli pengguna. Data yang disimpan pada tabel 
 Pada tahap pengembangan ini, sistem berjalan secara lokal. Rencana deployment dapat menggunakan:
 
 * Frontend: Vercel
-* Backend: Render
+* Backend: Vercel
 * Database produksi: Neon PostgreSQL atau layanan PostgreSQL lain
 
 SQLite digunakan untuk pengembangan lokal dan demonstrasi purwarupa.

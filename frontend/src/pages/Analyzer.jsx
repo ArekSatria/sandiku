@@ -1,33 +1,11 @@
 import { useState } from "react";
-
 import ResultCard from "../components/ResultCard";
 import api from "../services/api";
 
 function getErrorMessage(error) {
   const detail = error?.response?.data?.detail;
-  const status = error?.response?.status;
-
-  if (Array.isArray(detail)) {
-    return detail.map((item) => item.msg).join(", ");
-  }
-
-  if (typeof detail === "string") {
-    return detail;
-  }
-
-  if (status === 404) {
-    return "Endpoint analisis tidak ditemukan. Periksa URL backend.";
-  }
-
-  if (status === 500) {
-    return "Terjadi kesalahan pada server backend. Periksa log backend di Vercel.";
-  }
-
-  if (!error?.response) {
-    return "Frontend tidak dapat terhubung ke backend. Periksa CORS dan VITE_API_BASE_URL.";
-  }
-
-  return "Analisis gagal dilakukan. Pastikan backend aktif dan koneksi stabil.";
+  if (typeof detail === "string") return detail;
+  return "Analisis gagal. Pastikan koneksi internet Anda stabil.";
 }
 
 export default function Analyzer() {
@@ -39,7 +17,6 @@ export default function Analyzer() {
 
   async function handleAnalyze(event) {
     event.preventDefault();
-
     setErrorMessage("");
     setResult(null);
 
@@ -48,21 +25,11 @@ export default function Analyzer() {
       return;
     }
 
-    if (password.length > 128) {
-      setErrorMessage("Kata sandi maksimal 128 karakter.");
-      return;
-    }
-
     setLoading(true);
-
     try {
-      const response = await api.post("/api/analyze", {
-        password,
-      });
-
+      const response = await api.post("/api/analyze", { password });
       setResult(response.data);
     } catch (error) {
-      console.error("Analyze error:", error);
       setErrorMessage(getErrorMessage(error));
     } finally {
       setLoading(false);
@@ -72,22 +39,22 @@ export default function Analyzer() {
   return (
     <main className="page-shell">
       <section className="page-heading">
-        <p className="section-kicker">Password Analyzer</p>
-        <h1>Uji kekuatan kata sandi secara instan.</h1>
+        <p className="section-kicker">Credential Scanner</p>
+        <h1>Cek Kekuatan Kata Sandi Anda</h1>
         <p>
-          Sistem akan menilai kata sandi berdasarkan pola, panjang, variasi
-          karakter, blocklist lokal, dan indikasi kebocoran publik.
+          Ketahui seberapa aman kata sandi Anda dari ancaman peretasan. Sistem
+          akan mendeteksi kelemahan dan memeriksa apakah kata sandi tersebut
+          pernah bocor di internet.
         </p>
+        <br />
       </section>
 
       <section className="analyzer-layout">
         <aside className="glass-card analyzer-form-card">
           <div className="form-header">
-            <span className="form-icon">⌁</span>
-
             <div>
-              <h2>Form Analisis</h2>
-              <p>Masukkan kata sandi yang ingin diuji.</p>
+              <h2>Panel Pengujian</h2>
+              <p>Ketik kata sandi Anda di bawah ini.</p>
             </div>
           </div>
 
@@ -100,28 +67,38 @@ export default function Analyzer() {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                placeholder="Contoh: LangitBiru#KopiPagi27!"
+                placeholder="Analisis Password"
                 maxLength={128}
               />
 
               <button
                 type="button"
-                onClick={() => setShowPassword((current) => !current)}
+                className="icon-btn"
+                onClick={() => setShowPassword(!showPassword)}
+                title={
+                  showPassword
+                    ? "Sembunyikan kata sandi"
+                    : "Tampilkan kata sandi"
+                }
               >
-                {showPassword ? "Sembunyikan" : "Tampilkan"}
+                <i
+                  className={
+                    showPassword ? "bi bi-eye-slash-fill" : "bi bi-eye-fill"
+                  }
+                ></i>
               </button>
             </div>
 
             <div className="input-meta">
               <span>{password.length}/128 karakter</span>
-              <span>Kata sandi asli tidak disimpan</span>
+              <span>Aman & Anonim</span>
             </div>
 
             <div className="privacy-note">
-              <strong>Catatan privasi:</strong> SANDIKU tidak menyimpan kata
-              sandi asli yang Anda masukkan. Sistem hanya menyimpan metadata
-              anonim seperti panjang kata sandi, skor, kategori, status
-              kebocoran, dan waktu analisis.
+              <strong>Jaminan Keamanan:</strong> Infrastruktur SANDIKU
+              beroperasi dengan prinsip Zero-Knowledge. Kami murni hanya
+              menyimpan metadata keluaran analitik anonim tanpa menahan karakter
+              asli kata sandi Anda.
             </div>
 
             {errorMessage && <div className="form-alert">{errorMessage}</div>}
@@ -131,20 +108,9 @@ export default function Analyzer() {
               type="submit"
               disabled={loading}
             >
-              {loading ? "Menganalisis..." : "Analisis Sekarang"}
+              {loading ? "Sedang Memeriksa..." : "Cek Sekarang"}
             </button>
           </form>
-
-          <div className="analysis-hints">
-            <h3>Tips kata sandi kuat</h3>
-
-            <ul>
-              <li>Gunakan minimal 12 karakter.</li>
-              <li>Hindari nama, tanggal lahir, dan pola keyboard.</li>
-              <li>Gunakan kata sandi unik untuk setiap layanan.</li>
-              <li>Jangan gunakan kata sandi yang pernah bocor.</li>
-            </ul>
-          </div>
         </aside>
 
         <ResultCard result={result} />

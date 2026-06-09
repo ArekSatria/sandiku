@@ -13,22 +13,17 @@ export default function Login() {
 
   async function handleLogin(event) {
     event.preventDefault();
-
     setErrorMessage("");
 
     if (!email.trim() || !password.trim()) {
-      setErrorMessage("Email dan password wajib diisi.");
+      setErrorMessage("Alamat email dan kata sandi wajib diisi.");
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await api.post("/api/auth/login", {
-        email,
-        password,
-      });
-
+      const response = await api.post("/api/auth/login", { email, password });
       localStorage.setItem("sandiku_token", response.data.access_token);
 
       const profileResponse = await api.get("/api/auth/me");
@@ -43,7 +38,7 @@ export default function Login() {
       setErrorMessage(
         typeof detail === "string"
           ? detail
-          : "Login gagal. Periksa email dan password admin.",
+          : "Gagal masuk. Periksa kembali email dan kata sandi.",
       );
     } finally {
       setLoading(false);
@@ -52,62 +47,105 @@ export default function Login() {
 
   return (
     <main className="auth-shell">
-      <section className="auth-panel glass-card">
-        <div className="auth-brand">
-          <span className="brand-mark large">S</span>
+      <section className="auth-panel-horizontal glass-card">
+        {/* BAGIAN KIRI: BRANDING (Diperkecil) */}
+        <div className="auth-brand-side">
+          <span className="brand-mark-giant">
+            <i className="bi bi-shield-lock-fill"></i>
+          </span>
           <div>
-            <p className="section-kicker">Admin Access</p>
-            <h1>Masuk Dashboard</h1>
+            <h1 style={{ fontSize: "1.6rem", marginBottom: "0.2rem" }}>
+              Portal Admin
+            </h1>
+            <p
+              style={{
+                color: "var(--text-muted)",
+                fontSize: "0.85rem",
+                margin: 0,
+              }}
+            >
+              Sistem Manajemen Keamanan
+            </p>
+          </div>
+
+          <div
+            className="privacy-note"
+            style={{ marginTop: "auto", padding: "1rem", fontSize: "0.8rem" }}
+          >
+            <strong style={{ display: "block", marginBottom: "0.25rem" }}>
+              Otorisasi Tertutup
+            </strong>
+            Akses dilindungi JSON Web Token. Hanya untuk administrator sistem.
           </div>
         </div>
 
-        <p className="auth-desc">
-          Gunakan akun admin untuk mengakses statistik analisis kata sandi
-          secara anonim.
-        </p>
+        {/* BAGIAN KANAN: FORM LOGIN */}
+        <div className="auth-form-side">
+          <form onSubmit={handleLogin} className="modern-form">
+            <div>
+              <label
+                htmlFor="email"
+                style={{ display: "block", marginBottom: "0.5rem" }}
+              >
+                Alamat Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="admin@sandiku.local"
+              />
+            </div>
 
-        <form onSubmit={handleLogin} className="modern-form">
-          <label htmlFor="email">Email Admin</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="admin@sandiku.local"
-          />
+            <div>
+              <label
+                htmlFor="password"
+                style={{ display: "block", marginBottom: "0.5rem" }}
+              >
+                Kata Sandi
+              </label>
+              <div className="password-field">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Masukkan sandi akses"
+                />
+                <button
+                  type="button"
+                  className="icon-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                  title={showPassword ? "Sembunyikan" : "Tampilkan"}
+                >
+                  <i
+                    className={
+                      showPassword ? "bi bi-eye-slash-fill" : "bi bi-eye-fill"
+                    }
+                  ></i>
+                </button>
+              </div>
+            </div>
 
-          <label htmlFor="password">Password Admin</label>
-          <div className="password-field">
-            <input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder="Masukkan password admin"
-            />
+            {errorMessage && (
+              <div
+                className="form-alert"
+                style={{ padding: "0.75rem", fontSize: "0.85rem" }}
+              >
+                {errorMessage}
+              </div>
+            )}
 
             <button
-              type="button"
-              onClick={() => setShowPassword((current) => !current)}
+              className="btn btn-primary full-width"
+              type="submit"
+              disabled={loading}
+              style={{ marginTop: "0.25rem" }}
             >
-              {showPassword ? "Sembunyikan" : "Tampilkan"}
+              {loading ? "Memverifikasi..." : "Masuk"}
             </button>
-          </div>
-
-          {errorMessage && <div className="form-alert">{errorMessage}</div>}
-
-          <button
-            className="btn btn-primary full-width"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? "Memeriksa..." : "Masuk"}
-          </button>
-        </form>
-
-        <div className="privacy-banner">
-          Akses dashboard dilindungi token JWT dan hanya tersedia untuk admin
-          aktif.
+          </form>
         </div>
       </section>
     </main>

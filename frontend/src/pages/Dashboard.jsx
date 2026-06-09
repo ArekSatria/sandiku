@@ -60,16 +60,13 @@ export default function Dashboard() {
       );
 
       if (error?.response?.status === 401 || error?.response?.status === 403) {
-        localStorage.removeItem("sandiku_token");
-        localStorage.removeItem("sandiku_admin");
-        navigate("/login");
+        handleLogout();
       }
     } finally {
       setLoading(false);
     }
   }
 
-  // --- FITUR BARU: EKSPOR CSV ---
   function handleExportCSV() {
     if (!analyses || analyses.length === 0) {
       setErrorMessage("Tidak ada data riwayat analisis untuk diekspor.");
@@ -126,10 +123,10 @@ export default function Dashboard() {
       <section className="dashboard-heading">
         <div>
           <p className="section-kicker">Admin Dashboard</p>
-          <h1>Statistik Analisis SANDIKU</h1>
+          <h1>Statistik SANDIKU</h1>
           <p>
-            Dashboard menampilkan metadata anonim hasil analisis kata sandi
-            tanpa menyimpan kata sandi asli pengguna.
+            Memantau metrik analisis kata sandi secara anonim tanpa menyimpan
+            data pribadi pengguna.
           </p>
 
           {admin && (
@@ -141,12 +138,24 @@ export default function Dashboard() {
 
         <div className="dashboard-actions">
           <button className="btn btn-primary" onClick={handleExportCSV}>
+            <i
+              className="bi bi-file-earmark-excel-fill"
+              style={{ marginRight: "8px" }}
+            ></i>{" "}
             Ekspor CSV
           </button>
           <button className="btn btn-secondary" onClick={fetchDashboardData}>
+            <i
+              className="bi bi-arrow-clockwise"
+              style={{ marginRight: "8px" }}
+            ></i>{" "}
             Muat Ulang
           </button>
           <button className="btn btn-danger" onClick={handleLogout}>
+            <i
+              className="bi bi-box-arrow-right"
+              style={{ marginRight: "8px" }}
+            ></i>{" "}
             Logout
           </button>
         </div>
@@ -157,56 +166,44 @@ export default function Dashboard() {
       )}
 
       {loading ? (
-        <section className="glass-card loading-card">
-          <div className="loader" />
-          <p>Memuat data dashboard...</p>
+        <section className="glass-card result-empty">
+          <div className="empty-orb">
+            <i className="bi bi-hourglass-split"></i>
+          </div>
+          <h3>Memuat Dashboard...</h3>
         </section>
       ) : (
         <>
           <section className="dashboard-stats">
             <StatCard
-              icon="Σ"
+              icon={<i className="bi bi-bar-chart-fill"></i>}
               title="Total Analisis"
               value={formatNumber(statistics?.total_analyses)}
-              description="Seluruh pengujian kata sandi"
             />
 
             <StatCard
-              icon="Ø"
+              icon={<i className="bi bi-speedometer2"></i>}
               title="Rata-rata Skor"
               value={formatNumber(statistics?.average_score)}
-              description="Rata-rata skor keamanan"
             />
 
             <StatCard
-              icon="!"
+              icon={<i className="bi bi-shield-lock-fill"></i>}
               title="Password Bocor"
               value={formatNumber(statistics?.breached_count)}
-              description="Terdeteksi dalam HIBP"
             />
 
             <StatCard
-              icon="↯"
-              title="Total Jejak Bocor"
+              icon={<i className="bi bi-exclamation-triangle-fill"></i>}
+              title="Jejak Bocor"
               value={formatNumber(statistics?.total_breach_hits)}
-              description="Akumulasi breach_count"
-            />
-
-            <StatCard
-              icon="?"
-              title="HIBP Gagal"
-              value={formatNumber(statistics?.hibp_failed_count)}
-              description="Pemeriksaan eksternal gagal"
             />
           </section>
 
           <section className="dashboard-grid">
             <div className="glass-card">
               <div className="card-heading">
-                <div>
-                  <p className="section-kicker">Distribusi</p>
-                  <h2>Kategori Kata Sandi</h2>
-                </div>
+                <h2>Kategori Keamanan</h2>
               </div>
 
               <div className="distribution-list">
@@ -231,37 +228,52 @@ export default function Dashboard() {
                     );
                   })
                 ) : (
-                  <p className="muted-text">Belum ada data kategori.</p>
+                  <p className="muted-text">Belum ada data analisis.</p>
                 )}
               </div>
             </div>
 
             <div className="glass-card">
               <div className="card-heading">
-                <div>
-                  <p className="section-kicker">Privasi</p>
-                  <h2>Data yang Disimpan</h2>
-                </div>
+                <h2>Protokol Privasi (Zero-Knowledge)</h2>
               </div>
 
               <div className="privacy-checks">
-                <div>✓ Panjang kata sandi</div>
-                <div>✓ Skor dan kategori</div>
-                <div>✓ Status kebocoran</div>
-                <div>✓ Waktu analisis WIB</div>
-                <div>× Kata sandi asli tidak disimpan</div>
-                <div>× Hash kata sandi publik tidak disimpan</div>
+                <div>
+                  <i
+                    className="bi bi-check-circle-fill text-success"
+                    style={{ color: "#10b981", marginRight: "8px" }}
+                  ></i>{" "}
+                  Panjang & Kategori dicatat
+                </div>
+                <div>
+                  <i
+                    className="bi bi-check-circle-fill text-success"
+                    style={{ color: "#10b981", marginRight: "8px" }}
+                  ></i>{" "}
+                  Waktu (WIB) dicatat
+                </div>
+                <div>
+                  <i
+                    className="bi bi-x-circle-fill text-danger"
+                    style={{ color: "#ef4444", marginRight: "8px" }}
+                  ></i>{" "}
+                  Teks sandi <strong>tidak disimpan</strong>
+                </div>
+                <div>
+                  <i
+                    className="bi bi-x-circle-fill text-danger"
+                    style={{ color: "#ef4444", marginRight: "8px" }}
+                  ></i>{" "}
+                  Identitas pengguna <strong>tidak dilacak</strong>
+                </div>
               </div>
             </div>
           </section>
 
           <section className="glass-card">
             <div className="card-heading">
-              <div>
-                <p className="section-kicker">Riwayat</p>
-                <h2>Analisis Anonim Terbaru</h2>
-              </div>
-              <span className="muted-text">Maksimal 50 data terbaru</span>
+              <h2>Riwayat Pengujian Anonim</h2>
             </div>
 
             <div className="table-shell">
@@ -269,24 +281,23 @@ export default function Dashboard() {
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Waktu</th>
-                    <th>Panjang</th>
+                    <th>Waktu (WIB)</th>
+                    <th>Karakter</th>
                     <th>Skor</th>
                     <th>Kategori</th>
-                    <th>Status Bocor</th>
-                    <th>Jumlah Bocor</th>
-                    <th>HIBP</th>
+                    <th>Status HIBP</th>
+                    <th>Total Jejak</th>
                   </tr>
                 </thead>
                 <tbody>
                   {analyses.length ? (
                     analyses.map((item) => (
                       <tr key={item.id}>
-                        <td>{item.id}</td>
+                        <td>#{item.id}</td>
                         <td>{item.created_at}</td>
-                        <td>{item.password_length}</td>
+                        <td>{item.password_length} char</td>
                         <td>
-                          <strong>{item.score}</strong>
+                          <strong>{item.score}/100</strong>
                         </td>
                         <td>
                           <StatusBadge
@@ -299,26 +310,20 @@ export default function Dashboard() {
                           {item.is_breached ? (
                             <StatusBadge variant="danger">Bocor</StatusBadge>
                           ) : (
-                            <StatusBadge variant="success">
-                              Tidak Bocor
-                            </StatusBadge>
+                            <StatusBadge variant="success">Aman</StatusBadge>
                           )}
                         </td>
                         <td>{formatNumber(item.breach_count)}</td>
-                        <td>
-                          {item.hibp_status === "checked" ? (
-                            <StatusBadge variant="success">
-                              Berhasil
-                            </StatusBadge>
-                          ) : (
-                            <StatusBadge variant="warning">Gagal</StatusBadge>
-                          )}
-                        </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="8">Belum ada riwayat analisis.</td>
+                      <td
+                        colSpan="7"
+                        style={{ textAlign: "center", padding: "2rem" }}
+                      >
+                        Belum ada riwayat pengujian.
+                      </td>
                     </tr>
                   )}
                 </tbody>

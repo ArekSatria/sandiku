@@ -5,22 +5,20 @@ export default function Home() {
     <main className="page-shell">
       <section className="home-hero">
         <div className="hero-copy">
-          <p className="section-kicker">Cyber Hygiene Assistant</p>
-          <h1>
-            Analisis kata sandi dengan tampilan modern dan privasi terjaga.
-          </h1>
+          <p className="section-kicker">Keamanan Akun Digital</p>
+          <h1>Validasi Keamanan Kredensial Anda dengan Presisi Tinggi.</h1>
           <p>
-            SANDIKU membantu pengguna memahami kekuatan kata sandi melalui skor,
-            kategori keamanan, deteksi pola lemah, pemeriksaan kebocoran publik,
-            dan rekomendasi perbaikan yang mudah dipahami.
+            SANDIKU adalah alat bantu yang mudah digunakan untuk mengecek
+            tingkat keamanan kata sandi Anda. Dapatkan saran perbaikan secara
+            langsung tanpa khawatir kata sandi Anda disimpan.
           </p>
 
           <div className="hero-actions">
             <Link className="btn btn-primary" to="/analyzer">
-              Mulai Analisis
+              Mulai Cek Kata Sandi
             </Link>
             <Link className="btn btn-secondary" to="/login">
-              Login Admin
+              Portal Admin
             </Link>
           </div>
         </div>
@@ -33,7 +31,7 @@ export default function Home() {
           </div>
 
           <div className="hero-score">
-            <span>Security Score</span>
+            <span>Security Index</span>
             <strong>86</strong>
             <small>Sangat Kuat</small>
           </div>
@@ -41,49 +39,55 @@ export default function Home() {
           <div className="hero-bars">
             <div>
               <span>Panjang</span>
-              <b style={{ width: "90%" }} />
+              <b style={{ "--w": "90%" }} />
             </div>
             <div>
               <span>Variasi</span>
-              <b style={{ width: "82%" }} />
+              <b style={{ "--w": "82%" }} />
             </div>
             <div>
-              <span>Pola Aman</span>
-              <b style={{ width: "74%" }} />
+              <span>Pola</span>
+              <b style={{ "--w": "74%" }} />
             </div>
           </div>
 
           <div className="hero-safe-note">
-            ✓ Kata sandi asli tidak disimpan ke database.
+            ✓ Kata sandi Anda tidak akan disimpan.
           </div>
         </div>
       </section>
 
       <section className="feature-grid">
         <div className="glass-card feature-card">
-          <span className="feature-icon">01</span>
-          <h3>Analisis Hibrida</h3>
+          <span className="feature-icon">
+            <i className="bi bi-shield-check"></i>
+          </span>
+          <h3>Audit Heuristik Hibrida</h3>
           <p>
-            Menggabungkan zxcvbn, rule-based checking, blocklist lokal, dan
-            pemeriksaan HIBP.
+            Evaluasi mendalam menggunakan mesin komputasi zxcvbn, validasi
+            logika berlapis, dan filtrasi daftar hitam.
           </p>
         </div>
 
         <div className="glass-card feature-card">
-          <span className="feature-icon">02</span>
-          <h3>Privasi Anonim</h3>
+          <span className="feature-icon">
+            <i className="bi bi-incognito"></i>
+          </span>
+          <h3>Privasi Terisolasi</h3>
           <p>
-            Sistem tidak menyimpan kata sandi asli maupun hash kata sandi
-            publik.
+            Kata sandi yang Anda ketik tidak pernah ditransmisikan maupun
+            disimpan di dalam basis data.
           </p>
         </div>
 
         <div className="glass-card feature-card">
-          <span className="feature-icon">03</span>
-          <h3>Dashboard Admin</h3>
+          <span className="feature-icon">
+            <i className="bi bi-globe"></i>
+          </span>
+          <h3>Verifikasi Kebocoran Global</h3>
           <p>
-            Admin dapat melihat statistik analisis anonim untuk kebutuhan
-            evaluasi sistem.
+            Melacak riwayat paparan kompromi kredensial melalui koneksi
+            terenkripsi k-Anonymity ke basis data dunia.
           </p>
         </div>
       </section>

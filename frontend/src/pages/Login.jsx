@@ -26,16 +26,11 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // FIX: Menggunakan URLSearchParams agar dikirim sebagai x-www-form-urlencoded
-      // FastAPI OAuth2PasswordRequestForm membaca field 'username' dan 'password'
-      const params = new URLSearchParams();
-      params.append("username", cleanEmail);
-      params.append("password", cleanPassword);
-
-      const response = await api.post("/api/auth/login", params, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
+      // PERBAIKAN: Mengirim sebagai objek JSON murni (application/json)
+      // Menyesuaikan dengan ekspektasi Pydantic Model di Backend FastAPI Anda
+      const response = await api.post("/api/auth/login", {
+        email: cleanEmail,
+        password: cleanPassword,
       });
 
       localStorage.setItem("sandiku_token", response.data.access_token);

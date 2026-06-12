@@ -377,3 +377,70 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 800; letter-spacing: -
     text-align: center;
   }
 }
+
+.feedback-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .feedback-section {
+    grid-template-columns: 1fr 1fr; /* Membagi dua menyamping di layar besar */
+  }
+}
+
+.feedback-box {
+  padding: 1.5rem;
+  border-radius: 1.25rem;
+  border: 1px solid var(--border-medium);
+  background: var(--bg-surface);
+}
+
+.feedback-box.warning {
+  background: #fff1f2;
+  border-color: #fecdd3;
+}
+
+.feedback-box.suggestion {
+  background: #f0fdfa;
+  border-color: #ccfbf1;
+}
+
+.feedback-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin-bottom: 1.25rem;
+}
+
+.feedback-box.warning .feedback-title { color: #be123c; }
+.feedback-box.suggestion .feedback-title { color: #0f766e; }
+
+.custom-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.custom-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-body);
+}
+
+.custom-list li i {
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+  font-size: 1.1rem;
+}
+
+.feedback-box.warning .custom-list li i { color: #e11d48; }
+.feedback-box.suggestion .custom-list li i { color: #14b8a6; }

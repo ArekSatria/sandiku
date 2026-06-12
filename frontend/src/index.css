@@ -378,16 +378,20 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 800; letter-spacing: -
   }
 }
 
+/* --- FEEDBACK LIST UI IMPROVEMENTS --- */
 .feedback-section {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
-  margin-top: 1.5rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-light);
 }
 
 @media (min-width: 768px) {
   .feedback-section {
-    grid-template-columns: 1fr 1fr; /* Membagi dua menyamping di layar besar */
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
   }
 }
 
@@ -396,6 +400,7 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 800; letter-spacing: -
   border-radius: 1.25rem;
   border: 1px solid var(--border-medium);
   background: var(--bg-surface);
+  height: 100%;
 }
 
 .feedback-box.warning {

@@ -205,6 +205,6 @@ Pada tahap pengembangan ini, sistem berjalan secara lokal. Rencana deployment da
 
 * Frontend: Vercel
 * Backend: Vercel
-* Database produksi: Neon PostgreSQL atau layanan PostgreSQL lain
+* Database produksi: Neon PostgreSQL
 
 SQLite digunakan untuk pengembangan lokal dan demonstrasi purwarupa.

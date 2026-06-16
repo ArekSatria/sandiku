@@ -1,54 +1,75 @@
-# Hasil Pengujian Backend SANDIKU
+# Hasil Pengujian SANDIKU
 
-Pengujian backend SANDIKU dilakukan menggunakan pytest dan pytest-cov. Pengujian dilakukan untuk memvalidasi fungsi utama sistem, meliputi layanan analisis kata sandi, pemeriksaan blocklist, rule-based checking, pemeriksaan HIBP, autentikasi admin, proteksi token JWT, endpoint dashboard, serta validasi penyimpanan metadata anonim.
+Dokumen ini mencatat hasil verifikasi terhadap source code SANDIKU yang digunakan dalam laporan magang.
 
-## Ringkasan Hasil
+## Ringkasan Backend
 
-| Komponen            | Hasil      |
-| ------------------- | ---------- |
-| Framework pengujian | pytest     |
-| Coverage tool       | pytest-cov |
-| Jumlah pengujian    | 30 test    |
-| Status              | 30 passed  |
-| Warning             | 5 warnings |
-| Durasi              | 3.00 detik |
-| Total coverage      | 85%        |
+| Komponen            | Hasil                              |
+|---------------------|------------------------------------|
+| Framework pengujian | pytest                             |  
+| Coverage tool       | pytest-cov                         |
+| Jumlah pengujian    | 32 test                            |
+| Status              | 32 passed                          |
+| Warning             | 1 warning pada verifikasi terakhir |
+| Durasi              | sekitar 3,16 detik                 |
+| Total coverage      | 83%                                |
 
 ## Komponen yang Diuji
 
-| No | Komponen                    | Fokus Pengujian                                                        |
-| -- | --------------------------- | ---------------------------------------------------------------------- |
-| 1  | `BlocklistChecker`          | Deteksi kata sandi umum dan variasi substitusi karakter                |
-| 2  | `RuleChecker`               | Deteksi panjang, variasi karakter, pengulangan, urutan, dan pola tahun |
-| 3  | `HibpChecker`               | Status bocor, tidak bocor, dan gagal koneksi                           |
-| 4  | `PasswordAnalyzer`          | Skor, kategori, status HIBP, pola kelemahan, dan rekomendasi           |
-| 5  | `/api/analyze`              | Response analisis dan penyimpanan metadata anonim                      |
-| 6  | `/api/auth/login`           | Autentikasi admin dan penerbitan token JWT                             |
-| 7  | `/api/auth/me`              | Validasi token dan profil admin                                        |
-| 8  | `/api/dashboard/statistics` | Statistik hasil analisis                                               |
-| 9  | `/api/dashboard/analyses`   | Riwayat analisis anonim                                                |
-| 10 | Security checking           | Validasi bahwa response tidak memuat kata sandi asli                   |
+| No. | Komponen                    | Fokus Pengujian                                                          |
+|-----|-----------------------------|--------------------------------------------------------------------------|
+| 1   | `BlocklistChecker`          | Kata sandi umum dan substitusi karakter                                  |
+| 2   | `RuleChecker`               | Panjang, variasi, pengulangan, urutan, tahun, dan tanggal                |
+| 3   | `HibpChecker`               | Status bocor, tidak bocor, dan kegagalan koneksi                         |
+| 4   | `PasswordAnalyzer`          | Skor, kategori, status HIBP, pola, dan rekomendasi                       |
+| 5   | `/api/analyze`              | Respons analisis dan penyimpanan metadata anonim                         |
+| 6   | `/api/auth/login`           | Login admin dan penerbitan JWT                                           |
+| 7   | `/api/auth/me`              | Profil admin dan validasi token                                          |
+| 8   | `/api/dashboard/statistics` | Statistik agregat                                                        |
+| 9   | `/api/dashboard/analyses`   | Riwayat analisis anonim                                                  |
+| 10  | Security hardening          | Header keamanan, rate limiting, admin nonaktif, dan non-retensi password |
 
 ## Ringkasan Coverage
 
-| File                                | Coverage |
-| ----------------------------------- | -------: |
-| `app/core/security.py`              |     100% |
-| `app/models/analysis_log.py`        |     100% |
-| `app/models/user.py`                |     100% |
-| `app/routers/analyzer_router.py`    |     100% |
-| `app/routers/auth_router.py`        |     100% |
-| `app/routers/dashboard_router.py`   |      85% |
-| `app/schemas/analyzer_schema.py`    |     100% |
-| `app/schemas/auth_schema.py`        |     100% |
-| `app/services/blocklist_checker.py` |     100% |
-| `app/services/hibp_checker.py`      |      93% |
-| `app/services/password_analyzer.py` |      92% |
-| `app/services/rule_checker.py`      |      79% |
-| Total                               |      85% |
+| File                                 | Coverage |
+|--------------------------------------|----------|
+| `app/core/security.py`               | 100%     |
+| `app/models/analysis_log.py`         | 100%     |
+| `app/models/user.py`                 | 100%     |
+| `app/routers/analyzer_router.py`     | 100%     |
+| `app/routers/auth_router.py`         | 100%     |
+| `app/schemas/analyzer_schema.py`     | 100%     |
+| `app/schemas/auth_schema.py`         | 100%     |
+| `app/services/blocklist_checker.py`  | 100%     |
+| `app/services/hibp_checker.py`       | 93%      |
+| `app/services/password_analyzer.py`  | 92%      |
+| `app/core/rate_limiter.py`           | 94%      |
+| `app/core/security_headers.py`       | 88%      |
+| `app/core/dependencies.py`           | 82%      |
+| `app/core/config.py`                 | 79%      |
+| `app/services/rule_checker.py`       | 79%      |
+| `app/database.py`                    | 71%      |
+| `app/utils/timezone.py`              | 71%      | 
+| `app/routers/dashboard_router.py`    | 69%      |
+| Total                                | 83%      |
 
-## Kesimpulan Pengujian
+## Hasil Frontend
 
-Hasil pengujian menunjukkan bahwa backend SANDIKU telah berjalan sesuai kebutuhan utama sistem. Seluruh 30 pengujian berhasil dijalankan tanpa kegagalan. Cakupan pengujian sebesar 85% menunjukkan bahwa sebagian besar komponen utama backend telah tervalidasi, khususnya modul analisis kata sandi, autentikasi admin, proteksi token JWT, dashboard statistik, dan penyimpanan metadata analisis anonim.
+- Build produksi berhasil.
+- Rute utama tersedia.
+- Integrasi Axios dan Bearer token tersedia.
+- Pemeriksaan lint masih menemukan dua error dan satu warning pada versi yang diverifikasi.
 
-Warning yang muncul tidak menyebabkan kegagalan sistem. Sebagian warning berasal dari pustaka eksternal, sedangkan warning terkait waktu token JWT dapat diperbaiki dengan penggunaan objek waktu yang timezone-aware.
+## Catatan Reproduksi
+
+Konfigurasi `pytest.ini` memuat filter berikut:
+
+```ini
+ignore::starlette.exceptions.StarletteDeprecationWarning
+```
+
+Pada versi Starlette tertentu, kelas warning tersebut tidak tersedia dan pytest dapat berhenti saat membaca konfigurasi. Jika hal itu terjadi, perbarui filter warning atau jalankan pengujian dengan konfigurasi warning yang sesuai dengan versi pustaka yang digunakan.
+
+## Kesimpulan
+
+Seluruh 32 pengujian backend berhasil. Coverage 83% menunjukkan bahwa fungsi inti telah diuji, tetapi hasil tersebut tidak membuktikan sistem bebas kerentanan. UAT, pengujian beban, pengujian frontend otomatis, dan audit keamanan independen masih diperlukan.

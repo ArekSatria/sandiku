@@ -1,82 +1,105 @@
-# Rencana Deployment SANDIKU
+# Realisasi dan Panduan Deployment SANDIKU
 
-Dokumen ini menjelaskan rencana deployment sistem SANDIKU. Pada tahap pengembangan saat ini, sistem berjalan secara lokal menggunakan React.js, FastAPI, dan SQLite. Deployment produksi dapat dilakukan dengan memisahkan frontend, backend, dan database ke layanan cloud.
+Dokumen ini mencatat realisasi deployment SANDIKU pada 10 Juni 2026 sekaligus menjadi panduan untuk melakukan deployment ulang. Sistem memisahkan frontend, backend, dan basis data ke layanan yang berbeda.
 
-## Arsitektur Deployment
+## Status Deployment
 
-| Komponen   | Teknologi Lokal | Rencana Produksi          |
-| ---------- | --------------- | ------------------------- |
-| Frontend   | React.js + Vite | Vercel                    |
-| Backend    | FastAPI         | Render                    |
-| Database   | SQLite          | PostgreSQL, misalnya Neon |
-| Repository | Git lokal       | GitHub                    |
+Deployment produksi telah dilakukan menggunakan akun pribadi pengembang.
 
-## Rencana Deployment Frontend
+| Komponen   | Lingkungan Lokal                      | Lingkungan Produksi |
+|------------|---------------------------------------|---------------------|
+| Frontend   | React.js + Vite pada `localhost:5173` | Vercel              |
+| Backend    | FastAPI pada `127.0.0.1:8000`         | Vercel Functions    |
+| Basis data | SQLite                                | Neon PostgreSQL 16  |
+| Repositori | Git lokal                             | GitHub              |
 
-Frontend dapat dideploy ke Vercel karena proyek menggunakan React.js dan Vite. Environment variable yang harus disiapkan adalah:
+## Alamat Produksi
 
-```env
-VITE_API_BASE_URL=https://alamat-backend-produksi
+| Layanan      | URL                                       |
+|--------------|-------------------------------------------|
+| Frontend     | https://sandiku-frontend.vercel.app       |
+| Backend      | https://sandiku-backend.vercel.app        |
+| Status API   | https://sandiku-backend.vercel.app/       |
+| Health check | https://sandiku-backend.vercel.app/health |
+| Swagger UI   | https://sandiku-backend.vercel.app/docs   |
+
+## Basis Data Produksi
+
+| Parameter                     | Nilai                                         |
+|-------------------------------|-----------------------------------------------|
+| Penyedia                      | Neon                                          |
+| Proyek                        | `sandiku`                                     |
+| Database                      | `neondb`                                      |
+| Versi                         | PostgreSQL 16                                 |
+| Wilayah                       | Asia Pacific/Singapore (`aws-ap-southeast-1`) |
+| Tabel                         | `users`, `analysis_logs`                      |
+| Tanggal pembuatan/dokumentasi | 10 Juni 2026                                  |
+| Data uji saat dokumentasi     | 2 rekaman                                     |
+
+Connection string, kata sandi, token, dan secret tidak boleh dicantumkan pada dokumentasi, tangkapan layar, atau repositori.
+
+## Arsitektur Produksi
+
+```txt
+Pengguna
+   │
+   ▼
+Frontend React.js pada Vercel
+https://sandiku-frontend.vercel.app
+   │ HTTPS / JSON
+   ▼
+Backend FastAPI pada Vercel
+https://sandiku-backend.vercel.app
+   ├──► Neon PostgreSQL 16
+   └──► HIBP Pwned Passwords Range API
 ```
 
-Langkah umum:
+## Deployment Frontend ke Vercel
 
-1. Push source code ke GitHub.
-2. Hubungkan repository ke Vercel.
-3. Pilih folder `frontend` sebagai root project.
-4. Atur build command `npm run build`.
-5. Atur output directory `dist`.
-6. Tambahkan environment variable `VITE_API_BASE_URL`.
-7. Deploy dan uji halaman aplikasi.
+### Konfigurasi
 
-## Rencana Deployment Backend
+- Root Directory: `frontend`
+- Framework Preset: Vite
+- Build Command: `npm run build`
+- Output Directory: `dist`
 
-Backend dapat dideploy ke Render sebagai web service berbasis Python. Environment variable yang perlu disiapkan adalah:
+Environment variable:
 
 ```env
-DATABASE_URL=postgresql://username:password@host/database
-SECRET_KEY=random-string-produksi
-JWT_ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=60
-CORS_ORIGINS=https://alamat-frontend-produksi
-ADMIN_NAME=Administrator
-ADMIN_EMAIL=admin@sandiku.local
-ADMIN_PASSWORD=password-admin-produksi
+VITE_API_BASE_URL=https://sandiku-backend.vercel.app
 ```
 
-Langkah umum:
+## Pemeriksaan Setelah Deployment
 
-1. Push source code ke GitHub.
-2. Hubungkan repository ke Render.
-3. Pilih folder `backend` sebagai root service.
-4. Gunakan build command `pip install -r requirements.txt`.
-5. Gunakan start command `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
-6. Tambahkan environment variable produksi.
-7. Jalankan script inisialisasi database dan pembuatan admin jika diperlukan.
-8. Uji endpoint `/` dan `/docs`.
+| No. | Pemeriksaan              | Hasil yang Diharapkan |
+|---  |--------------------------|---------------------------------------------|
+| 1   | Buka frontend            | Halaman beranda tampil                      |
+| 2   | Buka backend `/`         | Respons status `success`                    |
+| 3   | Buka `/health`           | Respons status `healthy`                    |
+| 4   | Buka `/docs`             | Swagger UI tampil jika docs diaktifkan      |
+| 5   | Uji `/api/analyze`       | Status 200 dan hasil analisis lengkap       |
+| 6   | Uji login admin          | Token JWT diterbitkan                       |
+| 7   | Uji endpoint tanpa token | Akses ditolak 401/403                       |
+| 8   | Buka dashboard           | Statistik dan riwayat anonim tampil         |
+| 9   | Periksa Neon             | Metadata masuk ke `analysis_logs`           |
+| 10  | Periksa HIBP             | Status checked/breached tampil sesuai hasil |
 
-## Rencana Database Produksi
 
-SQLite digunakan untuk pengembangan lokal. Untuk produksi, PostgreSQL lebih disarankan karena lebih stabil untuk akses multi-user, transaksi, dan integrasi cloud.
+## Keterbatasan Deployment Saat Ini
 
-Rencana penggunaan PostgreSQL:
+1. `app/main.py` masih menggunakan `allow_origins=["*"]`, sehingga nilai `CORS_ORIGINS` belum benar-benar diterapkan oleh middleware.
+2. Rate limiter masih menggunakan memori proses dan belum konsisten untuk serverless multi-instance.
+3. Proyek belum menggunakan Alembic untuk migrasi basis data.
+4. Swagger UI masih aktif untuk kebutuhan dokumentasi.
+5. UAT, load testing, penetration testing, dan audit keamanan independen belum dilakukan.
 
-1. Buat database PostgreSQL pada layanan cloud.
-2. Salin connection string ke `DATABASE_URL`.
-3. Pastikan backend membaca `DATABASE_URL` dari environment variable.
-4. Jalankan inisialisasi tabel.
-5. Buat akun admin.
-6. Uji endpoint analisis dan dashboard.
+## Riwayat Deployment
 
-## Catatan Penting
+| Tanggal      | Kegiatan                                                                                        |
+|--------------|-------------------------------------------------------------------------------------------------|
+| 9 Juni 2026  | Pengembangan fungsional dan deployment dalam tahap akhir magang selesai.                        |
+| 10 Juni 2026 | Pembaruan deployment frontend, backend, dokumentasi API, dan koneksi Neon PostgreSQL dilakukan. |
 
-* Jangan deploy file `.env`.
-* Jangan upload database lokal `sandiku.db`.
-* Jangan gunakan `SECRET_KEY` contoh pada produksi.
-* Pastikan `CORS_ORIGINS` hanya berisi domain frontend produksi.
-* Pastikan akun admin menggunakan password kuat.
-* Swagger UI dapat tetap digunakan untuk demonstrasi, tetapi pada produksi final dapat dibatasi atau dinonaktifkan.
+## Kesimpulan
 
-## Status Saat Ini
-
-Sistem belum dideploy secara online. Deployment masih berada pada tahap perencanaan dan kesiapan struktur proyek. Sistem telah siap untuk dijalankan secara lokal dan sudah memiliki dokumentasi environment, panduan instalasi, dan pengujian otomatis backend.
+SANDIKU telah berhasil ditempatkan pada Vercel dan terhubung dengan Neon PostgreSQL. Deployment ini sesuai untuk purwarupa akademik dan demonstrasi. Sebelum digunakan secara lebih luas, konfigurasi CORS, rate limiting terdistribusi, migrasi basis data, pengujian pengguna, dan audit keamanan perlu diselesaikan.

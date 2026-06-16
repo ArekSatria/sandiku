@@ -1,34 +1,31 @@
 # Security Checklist SANDIKU
 
-Dokumen ini berisi daftar penguatan keamanan dasar yang telah diterapkan pada proyek SANDIKU.
+## Status Keamanan Dasar
 
-## Keamanan yang Telah Diterapkan
+| No. | Aspek                           | Status          | Keterangan                                         |
+|-----|---------------------------------|-----------------|----------------------------------------------------|
+| 1   | Password admin di-hash          | Sudah           | bcrypt melalui passlib                             |
+| 2   | JWT authentication              | Sudah           | Endpoint admin memerlukan Bearer token             |
+| 3   | Pemeriksaan admin aktif         | Sudah           | Admin nonaktif ditolak                             |
+| 4   | Password publik tidak disimpan  | Sudah           | Hanya metadata anonim yang dicatat                 |
+| 5   | HIBP k-Anonymity                | Sudah           | Hanya prefix lima karakter hash SHA-1 yang dikirim |
+| 6   | Input validation                | Sudah           | Input analisis dibatasi 1–128 karakter             |
+| 7   | CORS terbatas                   | Belum           | `main.py` masih memakai `allow_origins=["*"]`      |
+| 8   | Rate limiting login             | Sudah, terbatas | Masih berbasis memori                              |
+| 9   | Rate limiting analisis          | Sudah, terbatas | Masih berbasis memori                              |
+| 10  | Security headers                | Sudah           | Middleware menambahkan header dasar                |
+| 11  | Environment variable            | Sudah           | Konfigurasi rahasia dipisahkan dari kode           |
+| 12  | Swagger production toggle       | Sudah           | Dapat diatur melalui `ENABLE_DOCS`                 |
+| 13  | HTTPS produksi                  | Sudah           | Disediakan oleh Vercel                             |
+| 14  | MFA administrator               | Belum           | Belum diterapkan                                   |
+| 15  | Migrasi skema                   | Belum           | Alembic belum digunakan                            |
 
-| No | Aspek Keamanan | Status | Keterangan |
-|---|---|---|---|
-| 1 | Password admin di-hash | Sudah | Password admin disimpan menggunakan hash bcrypt melalui passlib |
-| 2 | JWT authentication | Sudah | Dashboard admin dilindungi token JWT |
-| 3 | Admin aktif | Sudah | Admin nonaktif tidak dapat login |
-| 4 | Password pengguna tidak disimpan | Sudah | Sistem hanya menyimpan metadata anonim |
-| 5 | HIBP k-Anonymity | Sudah | Sistem hanya mengirim prefix hash SHA-1 ke HIBP |
-| 6 | Input validation | Sudah | Password analisis dibatasi minimal 1 dan maksimal 128 karakter |
-| 7 | CORS terbatas | Sudah | CORS origin dibaca dari environment variable |
-| 8 | Rate limiting login | Sudah | Endpoint login dibatasi jumlah request per menit |
-| 9 | Rate limiting analisis | Sudah | Endpoint analisis dibatasi jumlah request per menit |
-| 10 | Security headers | Sudah | Middleware menambahkan header keamanan dasar |
-| 11 | Environment variable | Sudah | Konfigurasi rahasia tidak ditulis langsung pada source code |
-| 12 | Swagger production toggle | Sudah | Dokumentasi API dapat dinonaktifkan melalui `ENABLE_DOCS=false` |
+## Prioritas Perbaikan
 
-## Catatan
-
-Rate limiting yang diterapkan masih berbasis memori sehingga cocok untuk pengembangan lokal, purwarupa, dan demonstrasi. Untuk produksi multi-instance, rate limiting sebaiknya dipindahkan ke Redis atau layanan API gateway.
-
-## Rencana Penguatan Lanjutan
-
-- Menggunakan PostgreSQL untuk produksi.
-- Menambahkan HTTPS penuh pada server produksi.
-- Menambahkan Redis-based rate limiting.
-- Menambahkan audit logging admin.
-- Menambahkan mekanisme reset password admin.
-- Menonaktifkan Swagger UI pada production.
-- Menambahkan pemindaian dependency vulnerability.
+1. Terapkan `CORS_ORIGINS` pada middleware FastAPI.
+2. Pindahkan rate limiter ke Redis/KV atau layanan terdistribusi.
+3. Rotasi secret dan kredensial yang pernah terekspos.
+4. Tambahkan MFA dan mekanisme reset password admin.
+5. Evaluasi penyimpanan token pada localStorage.
+6. Tambahkan Alembic untuk migrasi basis data.
+7. Lakukan dependency scanning, UAT, load testing, dan penetration testing.

@@ -57,7 +57,7 @@ const formatWIB = (dateInput) => {
     }
 
     return ds; // Fallback jika format berbeda
-  } catch (error) {
+  } catch {
     return String(dateInput);
   }
 };

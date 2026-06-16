@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import StatCard from "../components/StatCard";
 import StatusBadge from "../components/StatusBadge";
@@ -12,6 +12,27 @@ function getCategoryClass(category) {
   return String(category || "")
     .toLowerCase()
     .replace(/\s+/g, "-");
+}
+
+function escapeCsvValue(value) {
+  const stringValue = String(value ?? "");
+  const escapedValue = stringValue.replace(/"/g, '""');
+
+  return `"${escapedValue}"`;
+}
+
+async function getDashboardData() {
+  const [profileResponse, statsResponse, analysesResponse] = await Promise.all([
+    api.get("/api/auth/me"),
+    api.get("/api/dashboard/statistics"),
+    api.get("/api/dashboard/analyses"),
+  ]);
+
+  return {
+    admin: profileResponse.data,
+    statistics: statsResponse.data,
+    analyses: analysesResponse.data || [],
+  };
 }
 
 export default function Dashboard() {
@@ -29,27 +50,22 @@ export default function Dashboard() {
     return statistics?.category_distribution || [];
   }, [statistics]);
 
-  function handleLogout() {
+  const handleLogout = useCallback(() => {
     localStorage.removeItem("sandiku_token");
     localStorage.removeItem("sandiku_admin");
     navigate("/login");
-  }
+  }, [navigate]);
 
-  async function fetchDashboardData() {
+  const fetchDashboardData = useCallback(async () => {
     setLoading(true);
     setErrorMessage("");
 
     try {
-      const [profileResponse, statsResponse, analysesResponse] =
-        await Promise.all([
-          api.get("/api/auth/me"),
-          api.get("/api/dashboard/statistics"),
-          api.get("/api/dashboard/analyses"),
-        ]);
+      const dashboardData = await getDashboardData();
 
-      setAdmin(profileResponse.data);
-      setStatistics(statsResponse.data);
-      setAnalyses(analysesResponse.data || []);
+      setAdmin(dashboardData.admin);
+      setStatistics(dashboardData.statistics);
+      setAnalyses(dashboardData.analyses);
     } catch (error) {
       const detail = error?.response?.data?.detail;
 
@@ -65,7 +81,7 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [handleLogout]);
 
   function handleExportCSV() {
     if (!analyses || analyses.length === 0) {
@@ -86,7 +102,7 @@ export default function Dashboard() {
 
     const rows = analyses.map((item) => [
       item.id,
-      `"${item.created_at}"`,
+      item.created_at,
       item.password_length,
       item.score,
       item.category,
@@ -96,8 +112,8 @@ export default function Dashboard() {
     ]);
 
     const csvContent = [
-      headers.join(","),
-      ...rows.map((row) => row.join(",")),
+      headers.map(escapeCsvValue).join(","),
+      ...rows.map((row) => row.map(escapeCsvValue).join(",")),
     ].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -105,18 +121,60 @@ export default function Dashboard() {
     const link = document.createElement("a");
 
     link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `Laporan_Analisis_SANDIKU_${new Date().getTime()}.csv`,
-    );
+    link.setAttribute("download", `Laporan_Analisis_SANDIKU_${Date.now()}.csv`);
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    let isMounted = true;
+
+    async function loadInitialDashboard() {
+      try {
+        const dashboardData = await getDashboardData();
+
+        if (!isMounted) {
+          return;
+        }
+
+        setAdmin(dashboardData.admin);
+        setStatistics(dashboardData.statistics);
+        setAnalyses(dashboardData.analyses);
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        const detail = error?.response?.data?.detail;
+
+        setErrorMessage(
+          typeof detail === "string"
+            ? detail
+            : "Gagal memuat dashboard. Silakan login ulang.",
+        );
+
+        if (
+          error?.response?.status === 401 ||
+          error?.response?.status === 403
+        ) {
+          handleLogout();
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadInitialDashboard();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [handleLogout]);
 
   return (
     <main className="page-shell">
@@ -144,6 +202,7 @@ export default function Dashboard() {
             ></i>{" "}
             Ekspor CSV
           </button>
+
           <button className="btn btn-secondary" onClick={fetchDashboardData}>
             <i
               className="bi bi-arrow-clockwise"
@@ -151,6 +210,7 @@ export default function Dashboard() {
             ></i>{" "}
             Muat Ulang
           </button>
+
           <button className="btn btn-danger" onClick={handleLogout}>
             <i
               className="bi bi-box-arrow-right"
@@ -221,6 +281,7 @@ export default function Dashboard() {
                             {item.total} · {percent}%
                           </strong>
                         </div>
+
                         <div className="distribution-track">
                           <b style={{ width: `${percent}%` }} />
                         </div>
@@ -246,6 +307,7 @@ export default function Dashboard() {
                   ></i>{" "}
                   Panjang & Kategori dicatat
                 </div>
+
                 <div>
                   <i
                     className="bi bi-check-circle-fill text-success"
@@ -253,6 +315,7 @@ export default function Dashboard() {
                   ></i>{" "}
                   Waktu (WIB) dicatat
                 </div>
+
                 <div>
                   <i
                     className="bi bi-x-circle-fill text-danger"
@@ -260,6 +323,7 @@ export default function Dashboard() {
                   ></i>{" "}
                   Teks sandi <strong>tidak disimpan</strong>
                 </div>
+
                 <div>
                   <i
                     className="bi bi-x-circle-fill text-danger"
@@ -289,6 +353,7 @@ export default function Dashboard() {
                     <th>Total Jejak</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {analyses.length ? (
                     analyses.map((item) => (

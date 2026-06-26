@@ -1,12 +1,12 @@
-# Security Checklist SANDIKU
+# Security Checklist SANDISCAN
 
 ## Status Keamanan Dasar
 
 **Tanggal status:** 16 Juni 2026
 
-Dokumen ini mencatat status kontrol keamanan dasar pada purwarupa SANDIKU. Checklist ini digunakan untuk menilai aspek keamanan yang sudah diterapkan, aspek yang masih terbatas, dan pekerjaan lanjutan yang perlu dilakukan sebelum sistem digunakan pada skala yang lebih luas.
+Dokumen ini mencatat status kontrol keamanan dasar pada purwarupa SANDISCAN. Checklist ini digunakan untuk menilai aspek keamanan yang sudah diterapkan, aspek yang masih terbatas, dan pekerjaan lanjutan yang perlu dilakukan sebelum sistem digunakan pada skala yang lebih luas.
 
-SANDIKU merupakan aplikasi edukatif untuk analisis kekuatan kata sandi. Sistem tidak ditujukan sebagai layanan keamanan produksi berskala besar dan belum melalui audit keamanan independen.
+SANDISCAN merupakan aplikasi edukatif untuk analisis kekuatan kata sandi. Sistem tidak ditujukan sebagai layanan keamanan produksi berskala besar dan belum melalui audit keamanan independen.
 
 ## Ringkasan Checklist
 
@@ -40,19 +40,19 @@ SANDIKU merupakan aplikasi edukatif untuk analisis kekuatan kata sandi. Sistem t
 
 ## Konfigurasi CORS
 
-Frontend dan backend SANDIKU berada pada domain Vercel yang berbeda, sehingga backend harus membatasi origin yang diizinkan.
+Frontend dan backend SANDISCAN berada pada domain Vercel yang berbeda, sehingga backend harus membatasi origin yang diizinkan.
 
 Konfigurasi production yang digunakan:
 
 ```env
-CORS_ORIGINS=https://sandiku-frontend.vercel.app
+CORS_ORIGINS=https://SANDISCAN-frontend.vercel.app
 ```
 
 Middleware backend telah disesuaikan agar membaca nilai dari `CORS_ORIGINS`, bukan menggunakan wildcard statis.
 
 ## Privasi dan Pemrosesan Kata Sandi
 
-SANDIKU tidak menyimpan kata sandi asli pengguna. Sistem hanya menyimpan metadata anonim hasil analisis, seperti panjang kata sandi, skor, kategori, status kebocoran, jumlah kemunculan pada data kebocoran, status pemeriksaan HIBP, pola kelemahan, dan waktu analisis.
+SANDISCAN tidak menyimpan kata sandi asli pengguna. Sistem hanya menyimpan metadata anonim hasil analisis, seperti panjang kata sandi, skor, kategori, status kebocoran, jumlah kemunculan pada data kebocoran, status pemeriksaan HIBP, pola kelemahan, dan waktu analisis.
 
 Pemeriksaan Have I Been Pwned dilakukan menggunakan pendekatan k-Anonymity. Backend menghitung hash SHA-1 dari kata sandi untuk kebutuhan pencocokan, tetapi hanya lima karakter awal hash yang dikirim ke layanan HIBP. Hash lengkap tidak disimpan di database.
 
@@ -64,18 +64,18 @@ Autentikasi administrator menggunakan JWT. Endpoint admin memerlukan Bearer toke
 
 Kontrol yang sudah tersedia:
 
-* password admin di-hash menggunakan bcrypt melalui passlib;
-* login admin menghasilkan JWT;
-* endpoint dashboard membutuhkan token;
-* admin nonaktif ditolak oleh backend;
-* masa berlaku token dikendalikan melalui `ACCESS_TOKEN_EXPIRE_MINUTES`.
+- password admin di-hash menggunakan bcrypt melalui passlib;
+- login admin menghasilkan JWT;
+- endpoint dashboard membutuhkan token;
+- admin nonaktif ditolak oleh backend;
+- masa berlaku token dikendalikan melalui `ACCESS_TOKEN_EXPIRE_MINUTES`.
 
 Keterbatasan yang masih ada:
 
-* belum tersedia MFA administrator;
-* belum tersedia refresh token;
-* belum tersedia mekanisme pencabutan token;
-* token frontend masih disimpan pada `localStorage`, sehingga perlu evaluasi lanjutan terhadap risiko XSS.
+- belum tersedia MFA administrator;
+- belum tersedia refresh token;
+- belum tersedia mekanisme pencabutan token;
+- token frontend masih disimpan pada `localStorage`, sehingga perlu evaluasi lanjutan terhadap risiko XSS.
 
 ## Rate Limiting
 
@@ -83,10 +83,10 @@ Rate limiting dasar telah diterapkan pada endpoint login dan analisis. Namun, me
 
 Keterbatasan:
 
-* kurang ideal untuk deployment serverless;
-* kurang konsisten pada lingkungan multi-instance;
-* state rate limit dapat berbeda antar-instance;
-* data rate limit dapat hilang ketika instance berganti.
+- kurang ideal untuk deployment serverless;
+- kurang konsisten pada lingkungan multi-instance;
+- state rate limit dapat berbeda antar-instance;
+- data rate limit dapat hilang ketika instance berganti.
 
 ## Security Headers
 
@@ -94,9 +94,9 @@ Backend telah menambahkan security headers dasar melalui middleware. Kontrol ini
 
 Aspek yang perlu dipertahankan:
 
-* header keamanan tetap aktif pada production;
-* konfigurasi HSTS hanya digunakan saat aplikasi benar-benar berjalan melalui HTTPS;
-* pengujian header dilakukan ulang setelah perubahan middleware atau deployment.
+- header keamanan tetap aktif pada production;
+- konfigurasi HSTS hanya digunakan saat aplikasi benar-benar berjalan melalui HTTPS;
+- pengujian header dilakukan ulang setelah perubahan middleware atau deployment.
 
 Environment variable yang relevan:
 
@@ -118,9 +118,9 @@ ENABLE_DOCS=false
 
 Rekomendasi:
 
-* matikan Swagger UI pada production final jika tidak dibutuhkan;
-* aktifkan hanya pada development atau demo terbatas;
-* hindari menampilkan informasi sensitif pada deskripsi endpoint.
+- matikan Swagger UI pada production final jika tidak dibutuhkan;
+- aktifkan hanya pada development atau demo terbatas;
+- hindari menampilkan informasi sensitif pada deskripsi endpoint.
 
 ## Environment Variable dan Secret
 
@@ -128,11 +128,11 @@ Nilai rahasia tidak boleh ditulis ke repositori, dokumentasi publik, atau tangka
 
 Nilai yang harus disimpan hanya pada environment variable Vercel:
 
-* `DATABASE_URL`;
-* `SECRET_KEY`;
-* `ADMIN_PASSWORD`;
-* kredensial database;
-* token atau secret lain yang digunakan pada production.
+- `DATABASE_URL`;
+- `SECRET_KEY`;
+- `ADMIN_PASSWORD`;
+- kredensial database;
+- token atau secret lain yang digunakan pada production.
 
 ## Prioritas Perbaikan
 
@@ -178,8 +178,8 @@ Nilai yang harus disimpan hanya pada environment variable Vercel:
 
 ## Kesimpulan Keamanan
 
-SANDIKU telah memiliki kontrol keamanan dasar yang memadai untuk purwarupa edukatif, termasuk hashing password admin, autentikasi JWT, pembatasan CORS production, rate limiting dasar, security headers, validasi input, serta prinsip tidak menyimpan kata sandi asli pengguna.
+SANDISCAN telah memiliki kontrol keamanan dasar yang memadai untuk purwarupa edukatif, termasuk hashing password admin, autentikasi JWT, pembatasan CORS production, rate limiting dasar, security headers, validasi input, serta prinsip tidak menyimpan kata sandi asli pengguna.
 
 Namun, sistem belum dapat diklaim sebagai production-grade security system. Beberapa aspek penting masih perlu diperkuat, terutama rate limiting terdistribusi, MFA administrator, mekanisme pencabutan token, migrasi database, dependency scanning, pengujian beban, penetration testing, dan audit keamanan independen.
 
-Dengan demikian, SANDIKU layak digunakan sebagai purwarupa akademik dan demonstrasi, tetapi belum disarankan sebagai layanan keamanan publik berskala besar tanpa penguatan dan audit lanjutan.
+Dengan demikian, SANDISCAN layak digunakan sebagai purwarupa akademik dan demonstrasi, tetapi belum disarankan sebagai layanan keamanan publik berskala besar tanpa penguatan dan audit lanjutan.

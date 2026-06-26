@@ -1,6 +1,6 @@
-# SANDIKU Frontend
+# SANDISCAN Frontend
 
-Frontend SANDIKU dibangun menggunakan React.js dan Vite. Frontend berfungsi sebagai antarmuka pengguna untuk menganalisis kata sandi serta sebagai antarmuka admin untuk melihat dashboard statistik.
+Frontend SANDISCAN dibangun menggunakan React.js dan Vite. Frontend berfungsi sebagai antarmuka pengguna untuk menganalisis kata sandi serta sebagai antarmuka admin untuk melihat dashboard statistik.
 
 ## Teknologi Frontend
 
@@ -24,3 +24,4 @@ frontend/
 ├── .env.example
 ├── package.json
 └── README.md
+```

@@ -1,10 +1,10 @@
-# Realisasi Deployment SANDIKU
+# Realisasi Deployment SANDISCAN
 
-Dokumen ini mencatat realisasi deployment SANDIKU sekaligus menjadi panduan untuk melakukan deployment ulang. Sistem memisahkan frontend, backend, dan basis data ke layanan yang berbeda.
+Dokumen ini mencatat realisasi deployment SANDISCAN sekaligus menjadi panduan untuk melakukan deployment ulang. Sistem memisahkan frontend, backend, dan basis data ke layanan yang berbeda.
 
 Deployment awal dilakukan pada 10 Juni 2026. Setelah proses cleanup proyek, konfigurasi frontend, backend, CORS, serta koneksi produksi telah diverifikasi ulang pada 16 Juni 2026.
 
-SANDIKU dikembangkan sebagai purwarupa akademik dan demonstratif. Sistem ini bukan perangkat operasional resmi instansi tempat magang.
+SANDISCAN dikembangkan sebagai purwarupa akademik dan demonstratif. Sistem ini bukan perangkat operasional resmi instansi tempat magang.
 
 ## Status Deployment
 
@@ -20,13 +20,13 @@ Deployment produksi telah dilakukan menggunakan akun pribadi pengembang.
 
 ## Alamat Produksi
 
-| Layanan      | URL                                       |
-| ------------ | ----------------------------------------- |
-| Frontend     | https://sandiku-frontend.vercel.app       |
-| Backend      | https://sandiku-backend.vercel.app        |
-| Status API   | https://sandiku-backend.vercel.app/       |
-| Health Check | https://sandiku-backend.vercel.app/health |
-| Swagger UI   | https://sandiku-backend.vercel.app/docs   |
+| Layanan      | URL                                         |
+| ------------ | ------------------------------------------- |
+| Frontend     | https://SANDISCAN-frontend.vercel.app       |
+| Backend      | https://SANDISCAN-backend.vercel.app        |
+| Status API   | https://SANDISCAN-backend.vercel.app/       |
+| Health Check | https://SANDISCAN-backend.vercel.app/health |
+| Swagger UI   | https://SANDISCAN-backend.vercel.app/docs   |
 
 > Swagger UI masih dapat digunakan untuk dokumentasi dan demonstrasi. Untuk lingkungan produksi final, dokumentasi API dapat dinonaktifkan melalui `ENABLE_DOCS=false`.
 
@@ -35,7 +35,7 @@ Deployment produksi telah dilakukan menggunakan akun pribadi pengembang.
 | Parameter                          | Nilai                                              |
 | ---------------------------------- | -------------------------------------------------- |
 | Penyedia                           | Neon                                               |
-| Proyek                             | `sandiku`                                          |
+| Proyek                             | `SANDISCAN`                                        |
 | Database                           | `neondb`                                           |
 | Versi                              | PostgreSQL 16                                      |
 | Wilayah                            | Asia Pacific/Singapore (`aws-ap-southeast-1`)      |
@@ -51,13 +51,13 @@ Pengguna
    │
    ▼
 Frontend React.js pada Vercel
-https://sandiku-frontend.vercel.app
+https://SANDISCAN-frontend.vercel.app
    │
    │ HTTPS / JSON
    │
    ▼
 Backend FastAPI pada Vercel
-https://sandiku-backend.vercel.app
+https://SANDISCAN-backend.vercel.app
    │
    ├──► Neon PostgreSQL 16
    │
@@ -79,7 +79,7 @@ https://sandiku-backend.vercel.app
 Environment variable frontend:
 
 ```env
-VITE_API_BASE_URL=https://sandiku-backend.vercel.app
+VITE_API_BASE_URL=https://SANDISCAN-backend.vercel.app
 ```
 
 ## Deployment Backend ke Vercel
@@ -105,7 +105,7 @@ SECRET_KEY=<secret-key-kuat>
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 ENABLE_DOCS=true
-CORS_ORIGINS=https://sandiku-frontend.vercel.app
+CORS_ORIGINS=https://SANDISCAN-frontend.vercel.app
 SECURITY_HEADERS_ENABLED=true
 HSTS_ENABLED=true
 HSTS_MAX_AGE=31536000
@@ -124,7 +124,7 @@ Frontend dan backend dideploy pada domain yang berbeda, sehingga backend harus m
 Konfigurasi backend yang digunakan:
 
 ```env
-CORS_ORIGINS=https://sandiku-frontend.vercel.app
+CORS_ORIGINS=https://SANDISCAN-frontend.vercel.app
 ```
 
 ## Pemeriksaan Setelah Deployment
@@ -187,7 +187,7 @@ Coverage terakhir yang terdokumentasi adalah 83%.
 CORS dapat diuji melalui terminal dengan perintah berikut:
 
 ```bash
-curl.exe -i -X OPTIONS "https://sandiku-backend.vercel.app/api/analyze" -H "Origin: https://sandiku-frontend.vercel.app" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: content-type,authorization"
+curl.exe -i -X OPTIONS "https://SANDISCAN-backend.vercel.app/api/analyze" -H "Origin: https://SANDISCAN-frontend.vercel.app" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: content-type,authorization"
 ```
 
 ## Keterbatasan Deployment Saat Ini
@@ -222,6 +222,6 @@ curl.exe -i -X OPTIONS "https://sandiku-backend.vercel.app/api/analyze" -H "Orig
 
 ## Kesimpulan
 
-SANDIKU telah berhasil ditempatkan pada Vercel dan terhubung dengan Neon PostgreSQL 16. Frontend dan backend berjalan sebagai dua proyek Vercel yang terpisah. Setelah perbaikan konfigurasi CORS, frontend produksi telah berhasil mengakses backend produksi.
+SANDISCAN telah berhasil ditempatkan pada Vercel dan terhubung dengan Neon PostgreSQL 16. Frontend dan backend berjalan sebagai dua proyek Vercel yang terpisah. Setelah perbaikan konfigurasi CORS, frontend produksi telah berhasil mengakses backend produksi.
 
 Deployment ini sesuai untuk kebutuhan purwarupa akademik dan demonstrasi. Sebelum digunakan lebih luas, pengembangan lanjutan perlu difokuskan pada rate limiting terdistribusi, migrasi basis data dengan Alembic, pengujian frontend otomatis, end-to-end testing, UAT, load testing, penetration testing, audit keamanan independen, serta monitoring production yang lebih terstruktur.

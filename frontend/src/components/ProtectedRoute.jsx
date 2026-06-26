@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 
 export default function ProtectedRoute({ children }) {
-  const token = localStorage.getItem("sandiku_token");
+  const token = localStorage.getItem("SANDISCAN_token");
 
   if (!token) {
     return <Navigate to="/login" replace />;

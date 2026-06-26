@@ -1,4 +1,4 @@
-"""Mesin analisis kekuatan kata sandi SANDIKU.
+"""Mesin analisis kekuatan kata sandi SANDISCAN.
 
 Modul ini menggabungkan beberapa pendekatan analisis, yaitu:
 1. zxcvbn untuk estimasi kekuatan berbasis pola manusia,

@@ -1,4 +1,4 @@
-"""Middleware security headers untuk SANDIKU."""
+"""Middleware security headers untuk SANDISCAN."""
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request

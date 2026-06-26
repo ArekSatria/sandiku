@@ -9,7 +9,7 @@ export default function Navbar() {
             <i className="bi bi-shield-check"></i>
           </span>
           <div>
-            <strong>SANDIKU</strong>
+            <strong>SANDISCAN</strong>
             <small>Sistem Analisis Kata Sandi</small>
           </div>
         </Link>

@@ -1,6 +1,6 @@
-# SANDIKU Backend
+# SANDISCAN Backend
 
-Backend SANDIKU dibangun menggunakan FastAPI. Backend menyediakan REST API untuk analisis kata sandi, autentikasi admin, dashboard statistik, serta penyimpanan metadata analisis secara anonim.
+Backend SANDISCAN dibangun menggunakan FastAPI. Backend menyediakan REST API untuk analisis kata sandi, autentikasi admin, dashboard statistik, serta penyimpanan metadata analisis secara anonim.
 
 ## Teknologi Backend
 
@@ -31,3 +31,4 @@ backend/
 ├── requirements.txt
 ├── pytest.ini
 └── README.md
+```

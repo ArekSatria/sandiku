@@ -51,8 +51,8 @@ export default function Dashboard() {
   }, [statistics]);
 
   const handleLogout = useCallback(() => {
-    localStorage.removeItem("sandiku_token");
-    localStorage.removeItem("sandiku_admin");
+    localStorage.removeItem("SANDISCAN_token");
+    localStorage.removeItem("SANDISCAN_admin");
     navigate("/login");
   }, [navigate]);
 
@@ -121,7 +121,10 @@ export default function Dashboard() {
     const link = document.createElement("a");
 
     link.setAttribute("href", url);
-    link.setAttribute("download", `Laporan_Analisis_SANDIKU_${Date.now()}.csv`);
+    link.setAttribute(
+      "download",
+      `Laporan_Analisis_SANDISCAN_${Date.now()}.csv`,
+    );
 
     document.body.appendChild(link);
     link.click();
@@ -181,7 +184,7 @@ export default function Dashboard() {
       <section className="dashboard-heading">
         <div>
           <p className="section-kicker">Admin Dashboard</p>
-          <h1>Statistik SANDIKU</h1>
+          <h1>Statistik SANDISCAN</h1>
           <p>
             Memantau metrik analisis kata sandi secara anonim tanpa menyimpan
             data pribadi pengguna.

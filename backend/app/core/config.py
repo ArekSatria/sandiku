@@ -1,4 +1,4 @@
-"""Konfigurasi terpusat aplikasi SANDIKU."""
+"""Konfigurasi terpusat aplikasi SANDISCAN."""
 
 import os
 from pathlib import Path
@@ -22,7 +22,7 @@ def get_bool_env(key: str, default: bool = False) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "y", "on"}
 
 
-DEFAULT_DATABASE_URL = f"sqlite:///{BACKEND_DIR / 'sandiku.db'}"
+DEFAULT_DATABASE_URL = f"sqlite:///{BACKEND_DIR / 'SANDISCAN.db'}"
 
 DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
 
@@ -57,7 +57,7 @@ LOGIN_RATE_LIMIT_PER_MINUTE = int(os.getenv("LOGIN_RATE_LIMIT_PER_MINUTE", "5"))
 ANALYZE_RATE_LIMIT_PER_MINUTE = int(os.getenv("ANALYZE_RATE_LIMIT_PER_MINUTE", "30"))
 
 ADMIN_NAME = os.getenv("ADMIN_NAME", "Administrator")
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@sandiku.local")
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@SANDISCAN.local")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "")
 
 if APP_ENV == "production":

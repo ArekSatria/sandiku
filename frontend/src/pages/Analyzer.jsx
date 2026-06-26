@@ -95,7 +95,7 @@ export default function Analyzer() {
             </div>
 
             <div className="privacy-note">
-              <strong>Jaminan Keamanan:</strong> Infrastruktur SANDIKU
+              <strong>Jaminan Keamanan:</strong> Infrastruktur SANDISCAN
               beroperasi dengan prinsip Zero-Knowledge. Kami murni hanya
               menyimpan metadata keluaran analitik anonim tanpa menahan karakter
               asli kata sandi Anda.

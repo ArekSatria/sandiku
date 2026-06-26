@@ -47,7 +47,7 @@ class RuleChecker:
         "bismillah",
         "indonesia",
         "merdeka",
-        "sandiku",
+        "SANDISCAN",
     ]
 
     @staticmethod

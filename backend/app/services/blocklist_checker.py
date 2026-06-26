@@ -46,7 +46,7 @@ class BlocklistChecker:
         "pancasila",
         "sumsel",
         "palembang",
-        "sandiku",
+        "SANDISCAN",
     }
 
     @staticmethod

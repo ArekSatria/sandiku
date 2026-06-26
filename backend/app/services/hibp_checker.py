@@ -29,7 +29,7 @@ class HibpChecker:
             response = requests.get(
                 HibpChecker.API_URL.format(prefix=prefix),
                 timeout=timeout,
-                headers={"User-Agent": "SANDIKU-Password-Analyzer"},
+                headers={"User-Agent": "SANDISCAN-Password-Analyzer"},
             )
             response.raise_for_status()
         except requests.RequestException as exc:

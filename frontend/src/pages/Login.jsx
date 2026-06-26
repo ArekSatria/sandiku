@@ -5,7 +5,7 @@ import api from "../services/api";
 export default function Login() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("admin@sandiku.local");
+  const [email, setEmail] = useState("admin@SANDISCAN.local");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -33,7 +33,7 @@ export default function Login() {
         password: cleanPassword,
       });
 
-      localStorage.setItem("sandiku_token", response.data.access_token);
+      localStorage.setItem("SANDISCAN_token", response.data.access_token);
 
       // Ambil data profil admin menggunakan token yang baru didapat
       const profileResponse = await api.get("/api/auth/me", {
@@ -43,7 +43,7 @@ export default function Login() {
       });
 
       localStorage.setItem(
-        "sandiku_admin",
+        "SANDISCAN_admin",
         JSON.stringify(profileResponse.data),
       );
 
@@ -109,7 +109,7 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder="admin@sandiku.local"
+                placeholder="admin@SANDISCAN.local"
               />
             </div>
 

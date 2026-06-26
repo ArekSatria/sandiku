@@ -10,7 +10,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("sandiku_token");
+    const token = localStorage.getItem("SANDISCAN_token");
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -27,8 +27,8 @@ api.interceptors.response.use(
     const status = error?.response?.status;
 
     if (status === 401 || status === 403) {
-      localStorage.removeItem("sandiku_token");
-      localStorage.removeItem("sandiku_admin");
+      localStorage.removeItem("SANDISCAN_token");
+      localStorage.removeItem("SANDISCAN_admin");
     }
 
     return Promise.reject(error);

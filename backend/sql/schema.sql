@@ -1,4 +1,4 @@
--- Skema database SANDIKU untuk dokumentasi dan rujukan manual.
+-- Skema database SANDISCAN untuk dokumentasi dan rujukan manual.
 -- Implementasi lokal memakai SQLite. Untuk produksi, struktur ini dapat
 -- dimigrasikan ke PostgreSQL dengan penyesuaian tipe data serial/timestamp.
 

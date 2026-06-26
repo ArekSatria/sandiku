@@ -1,6 +1,6 @@
-# Hasil Pengujian SANDIKU
+# Hasil Pengujian SANDISCAN
 
-Dokumen ini mencatat hasil verifikasi terhadap source code SANDIKU yang digunakan dalam laporan magang. Pengujian mencakup backend, frontend, serta verifikasi deployment production setelah proses cleanup proyek dan perbaikan konfigurasi CORS.
+Dokumen ini mencatat hasil verifikasi terhadap source code SANDISCAN yang digunakan dalam laporan magang. Pengujian mencakup backend, frontend, serta verifikasi deployment production setelah proses cleanup proyek dan perbaikan konfigurasi CORS.
 
 ## Status Verifikasi Terakhir
 
@@ -20,14 +20,14 @@ Dokumen ini mencatat hasil verifikasi terhadap source code SANDIKU yang digunaka
 
 ## Ringkasan Backend
 
-| Komponen                               | Hasil                                                                      |
-| -------------------------------------- | -------------------------------------------------------------------------- |
-| Framework pengujian                    | pytest                                                                     |
-| Coverage tool                          | pytest-cov                                                                 |
-| Jumlah pengujian                       | 32 test                                                                    |
-| Status pengujian                       | 32 passed                                                                  |
-| Warning                                | Terdapat warning dependency pada verifikasi terakhir                       |
-| Total coverage terakhir terdokumentasi | 83%                                                                        |
+| Komponen                               | Hasil                                                |
+| -------------------------------------- | ---------------------------------------------------- |
+| Framework pengujian                    | pytest                                               |
+| Coverage tool                          | pytest-cov                                           |
+| Jumlah pengujian                       | 32 test                                              |
+| Status pengujian                       | 32 passed                                            |
+| Warning                                | Terdapat warning dependency pada verifikasi terakhir |
+| Total coverage terakhir terdokumentasi | 83%                                                  |
 
 ## Komponen Backend yang Diuji
 
@@ -102,7 +102,7 @@ Frontend dan backend berada pada domain yang berbeda, sehingga CORS perlu dikonf
 Konfigurasi yang digunakan:
 
 ```env
-CORS_ORIGINS=https://sandiku-frontend.vercel.app
+CORS_ORIGINS=https://SANDISCAN-frontend.vercel.app
 ```
 
 ## Perintah Pengujian
@@ -136,19 +136,19 @@ Meskipun seluruh pengujian backend lulus dan frontend berhasil melewati lint ser
 
 Pengujian yang belum dilakukan secara formal meliputi:
 
-* pengujian frontend otomatis;
-* end-to-end testing;
-* User Acceptance Testing;
-* pengujian aksesibilitas formal;
-* pengujian lintas peramban secara lengkap;
-* pengujian beban;
-* penetration testing;
-* audit keamanan independen;
-* dependency scanning terstruktur;
-* monitoring error production.
+- pengujian frontend otomatis;
+- end-to-end testing;
+- User Acceptance Testing;
+- pengujian aksesibilitas formal;
+- pengujian lintas peramban secara lengkap;
+- pengujian beban;
+- penetration testing;
+- audit keamanan independen;
+- dependency scanning terstruktur;
+- monitoring error production.
 
 ## Kesimpulan
 
-Source code SANDIKU telah melewati verifikasi dasar setelah proses cleanup dan deployment production. Backend berhasil menjalankan 32 pengujian, frontend berhasil melewati lint dan build, serta integrasi frontend-backend production telah berhasil setelah konfigurasi CORS disesuaikan.
+Source code SANDISCAN telah melewati verifikasi dasar setelah proses cleanup dan deployment production. Backend berhasil menjalankan 32 pengujian, frontend berhasil melewati lint dan build, serta integrasi frontend-backend production telah berhasil setelah konfigurasi CORS disesuaikan.
 
 Coverage backend terakhir yang terdokumentasi adalah 83%, yang menunjukkan bahwa fungsi inti telah diuji. Namun, hasil tersebut tidak membuktikan sistem bebas dari kerentanan. Pengujian lanjutan seperti frontend automated testing, end-to-end testing, UAT, load testing, penetration testing, dan audit keamanan independen tetap diperlukan sebelum sistem digunakan pada skala yang lebih luas.

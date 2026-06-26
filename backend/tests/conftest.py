@@ -52,7 +52,7 @@ def db_session():
 @pytest.fixture()
 def test_app(db_session):
     """Membuat instance FastAPI khusus untuk testing."""
-    app = FastAPI(title="SANDIKU Test API")
+    app = FastAPI(title="SANDISCAN Test API")
 
     app.add_middleware(SecurityHeadersMiddleware)
 

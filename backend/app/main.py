@@ -11,8 +11,8 @@ init_database()
 ensure_admin_from_env()
 
 app = FastAPI(
-    title="SANDIKU API",
-    description="API untuk Sistem Analisis Kekuatan Kata Sandi (SANDIKU)",
+    title="SANDISCAN API",
+    description="API untuk Sistem Analisis Kekuatan Kata Sandi (SANDISCAN)",
     version="1.0.0",
     docs_url="/docs" if ENABLE_DOCS else None,
     redoc_url="/redoc" if ENABLE_DOCS else None,
@@ -38,7 +38,7 @@ app.include_router(dashboard_router.router)
 def read_root():
     return {
         "status": "success",
-        "message": "API SANDIKU aktif dan berjalan dengan baik.",
+        "message": "API SANDISCAN aktif dan berjalan dengan baik.",
     }
 
 
@@ -46,5 +46,5 @@ def read_root():
 def health_check():
     return {
         "status": "healthy",
-        "service": "SANDIKU API",
+        "service": "SANDISCAN API",
     }

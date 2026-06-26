@@ -8,7 +8,7 @@ export default function Home() {
           <p className="section-kicker">Keamanan Akun Digital</p>
           <h1>Validasi Keamanan Kredensial Anda dengan Presisi Tinggi.</h1>
           <p>
-            SANDIKU adalah alat bantu yang mudah digunakan untuk mengecek
+            SANDISCAN adalah alat bantu yang mudah digunakan untuk mengecek
             tingkat keamanan kata sandi Anda. Dapatkan saran perbaikan secara
             langsung tanpa khawatir kata sandi Anda disimpan.
           </p>

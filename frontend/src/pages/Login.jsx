@@ -5,7 +5,7 @@ import api from "../services/api";
 export default function Login() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("admin@SANDISCAN.local");
+  const [email, setEmail] = useState("admin@sandiscan.local");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -109,7 +109,7 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder="admin@SANDISCAN.local"
+                placeholder="admin@example.local"
               />
             </div>
 

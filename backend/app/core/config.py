@@ -57,7 +57,7 @@ LOGIN_RATE_LIMIT_PER_MINUTE = int(os.getenv("LOGIN_RATE_LIMIT_PER_MINUTE", "5"))
 ANALYZE_RATE_LIMIT_PER_MINUTE = int(os.getenv("ANALYZE_RATE_LIMIT_PER_MINUTE", "30"))
 
 ADMIN_NAME = os.getenv("ADMIN_NAME", "Administrator")
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@SANDISCAN.local")
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@sandiscan.local")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "")
 
 if APP_ENV == "production":

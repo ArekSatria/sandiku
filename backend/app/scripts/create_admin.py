@@ -5,7 +5,7 @@ python -m app.scripts.create_admin
 
 Nilai admin dapat diambil dari .env:
 ADMIN_NAME=Administrator
-ADMIN_EMAIL=admin@SANDISCAN.local
+ADMIN_EMAIL=admin@sandiscan.local
 ADMIN_PASSWORD=ArekSatria07!
 """
 

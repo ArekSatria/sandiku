@@ -184,7 +184,7 @@ export default function Dashboard() {
       <section className="dashboard-heading">
         <div>
           <p className="section-kicker">Admin Dashboard</p>
-          <h1>Statistik SANDISCAN</h1>
+          <h1>STATISTIC SANDISCAN</h1>
           <p>
             Memantau metrik analisis kata sandi secara anonim tanpa menyimpan
             data pribadi pengguna.

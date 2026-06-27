@@ -1,7 +1,3 @@
-/* =========================================
-   SANDISCAN - Ultra-Professional SaaS UI
-   ========================================= */
-
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 :root {
@@ -110,21 +106,62 @@ input {
   display: inline-flex;
   align-items: center;
   gap: 0.875rem;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.brand-logo-img {
+  width: 44px;
+  height: 44px;
+  display: block;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  line-height: 1.1;
+}
+
+.brand-name {
+  display: block;
+  color: var(--text-heading);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.brand-subtitle {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 /* --- ICONS PERFECT CENTERING FIX --- */
-/* Menggunakan Flexbox Absolute Centering untuk semua wadah ikon */
+/* Tetap dipertahankan untuk halaman lain yang masih memakai ikon lama */
 .brand-mark,
 .feature-icon,
 .stat-icon,
 .panel-icon,
 .form-icon,
-.icon-btn,
 .empty-orb {
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 0;
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .brand-mark {
@@ -441,6 +478,7 @@ h4 {
 }
 .icon-btn {
   width: 3.5rem;
+  min-width: 3.5rem;
   border-radius: 1rem;
   color: var(--accent-primary);
   background: var(--accent-light);
@@ -448,16 +486,15 @@ h4 {
   transition: background 0.2s ease;
   font-size: 1.25rem;
 }
+
 .icon-btn:hover {
   background: #c7d2fe;
 }
 
-.input-meta {
-  display: flex;
-  justify-content: space-between;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 500;
+.icon-btn i {
+  display: inline-block;
+  font-size: 1.25rem;
+  line-height: 1;
 }
 .form-alert {
   padding: 1rem;
@@ -1063,4 +1100,64 @@ h4 {
 }
 .feedback-box.suggestion .custom-list li i {
   color: #14b8a6;
+}
+
+
+/* --- SANDISCAN LOGO RESPONSIVE FIX --- */
+@media (max-width: 768px) {
+  .brand-logo-img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .brand-lockup {
+    justify-content: center;
+  }
+
+  .brand-text {
+    text-align: left;
+  }
+
+  .brand-name {
+    font-size: 0.95rem;
+  }
+
+  .brand-subtitle {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-subtitle {
+    display: none;
+  }
+
+  .brand-logo-img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .nav-links a {
+    padding: 0.55rem 0.9rem;
+    font-size: 0.8rem;
+  }
+}
+
+.admin-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 6rem;
+  height: 6rem;
+  border-radius: 1.5rem;
+  background: #ffffff;
+  box-shadow: 0 18px 36px -12px rgba(15, 23, 42, 0.18);
+  overflow: hidden;
+}
+
+.admin-logo-img {
+  width: 5rem;
+  height: 5rem;
+  object-fit: contain;
+  display: block;
 }

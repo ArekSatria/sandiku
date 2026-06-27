@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import sandiscanLogo from "../assets/sandiscan-logo.png";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -65,9 +66,14 @@ export default function Login() {
       <section className="auth-panel-horizontal glass-card">
         {/* BAGIAN KIRI: BRANDING */}
         <div className="auth-brand-side">
-          <span className="brand-mark-giant">
-            <i className="bi bi-shield-lock-fill"></i>
-          </span>
+          <div className="admin-logo-wrap">
+            <img
+              src={sandiscanLogo}
+              alt="SANDISCAN"
+              className="admin-logo-img"
+            />
+          </div>
+
           <div>
             <h1 style={{ fontSize: "1.6rem", marginBottom: "0.2rem" }}>
               Portal Admin
